@@ -4,8 +4,8 @@ print('i love memes')
 
 cool_func <- function(x){
   y = x^2
-  cat('your function result is', a ,'lol')
+  paste('your function result is', a ,'lol')
   #return(y)
 }
 
-cool_func(3)
+cool_func(6)
