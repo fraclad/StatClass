@@ -60,7 +60,6 @@ subset_ddt <- subset(subset_river, subset = DDT > 4.0)
 ## Task 4
 ```{r}
 library(dplyr)
-library(ggplot2)
 
 table_river <- table(ddt$RIVER)
 barplot(table_river, col = c("yellow", "red", "green", "dark blue"), xlab = "River", ylab = "Count")
@@ -87,9 +86,14 @@ boxplot(ddt$LENGTH, col = 'green', main = 'length')
 ## Task 7
 ```{r}
 coplot(LENGTH ~ WEIGHT | RIVER, data = ddt)
-coplot(DDT ~ WEIGHT | SPECIES, data = ddt, col = c("black", "red", "green"))
+coplot(DDT ~ WEIGHT | SPECIES, data = ddt)
 ```
 
+## Task 8
+```{r}
+library(ggplot2)
+
+```
 
 
 
