@@ -1,7 +1,7 @@
 ---
 title: "Lab 1"
-author: "Rahmat Ashari" 
-date: " ```r Sys.time()``` "
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
 output: 
   html_document:
     toc: yes
@@ -12,8 +12,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Lab 1 
-This is lab 1
+# Lab 1
+This is lab 1. There are 8 tasks and 4 clicker questions. 
 
 ## Task 1
 
@@ -48,14 +48,34 @@ paste('the quantitative variables in ddt are ', toString(quant))
 n_species <- nlevels(ddt[,"SPECIES"])
 paste('there are in total ', n_species, ' number of species')
 
-#the first subset is to gather SPECIES == LMBASS and CCATFISH with weight > 800 gr
-subset_species <- ddt[ddt$SPECIES == "LMBASS" | ddt$SPECIES == "CCATFISH" ,]
-subset_weight <- subset(subset_species, subset = WEIGHT > 800)
+#the first subset is to gather SPECIES == LMBASS with weight > 800 gr
+subset_1 = ddt[ddt$SPECIES == "LMBASS" & ddt$WEIGHT > 800,]
 
-#the second subset is to gather RIVER == SCM with DDT > 10
-subset_river <- ddt[ddt$RIVER == "SCM",]
-subset_ddt <- subset(subset_river, subset = DDT > 4.0)
+#the second subset is to gather RIVER == SCM with DDT > 4
+subset_2 = ddt[ddt$RIVER == "SCM" & ddt$DDT > 4.0,]
+
 ```
+
+### CLICKER QUESTIONS
+```{r}
+'Question 1'
+mean_length = mean(ddt$LENGTH)
+cat('The mean length of fish in ddt df is ', mean_length, '\n')
+
+'Question 2'
+sd_weight = sd(ddt$WEIGHT)
+cat('The std dev of fish weight in ddt df is ', sd_weight, '\n')
+
+'Question 3'
+plot_check = plot(ddt$WEIGHT, ddt$LENGTH, col = 'red')
+plot_check2 = plot(ddt$LENGTH, ddt$WEIGHT)
+print('the graph yielded is not the same with the one provided. Hence, the answer is No. The graph provided is weight vs length not length vs weight')
+
+'Question 4'
+v = 1:20
+cat('the answer to the question asked is ', v[20]/20)
+```
+
 
 ## Task 4
 ```{r}
@@ -65,14 +85,15 @@ table_river <- table(ddt$RIVER)
 barplot(table_river, col = c("yellow", "red", "green", "dark blue"), xlab = "River", ylab = "Count")
 
 table_fishcross <- table(ddt$SPECIES, ddt$RIVER)
-barplot(table_fishcross, beside = T, col = c("black", "red", "green"), legend = rownames(table_fishcross), 
+barplot(table_fishcross, beside = T, col = c("black", "red", "green"), legend =  rownames(table_fishcross),
          xlab = "River", ylab = "Count")
 ```
 
 ## Task 5
 ```{r}
 fish_species <- table(ddt$SPECIES)
-pie(fish_species)
+pie(fish_species, main = 'Pie chart for species')
+pie(table_river, main = 'Pie chart for rivers')
 ```
 
 ## Task 6
@@ -85,14 +106,22 @@ boxplot(ddt$LENGTH, col = 'green', main = 'length')
 
 ## Task 7
 ```{r}
-coplot(LENGTH ~ WEIGHT | RIVER, data = ddt)
-coplot(DDT ~ WEIGHT | SPECIES, data = ddt)
+coplot(LENGTH ~ WEIGHT | RIVER, data = ddt, col = factor(ddt$SPECIES))
+coplot(DDT ~ WEIGHT | SPECIES, data = ddt, col = factor(ddt$RIVER))
 ```
 
 ## Task 8
 ```{r}
 library(ggplot2)
 
+g = ggplot(ddt, aes(x = SPECIES, y = WEIGHT )) + geom_boxplot(aes(fill = RIVER)) + ggtitle('Rahmat Ashari')
+g
+
+f = ggplot(ddt, aes(x = RIVER, y = LENGTH )) + geom_violin(aes(fill = SPECIES)) + ggtitle('Rahmat Ashari')
+f
+
+m = ggplot(ddt, aes(x = WEIGHT, y = LENGTH )) + geom_point(aes(color = SPECIES)) + ggtitle('Rahmat Ashari')
+m
 ```
 
 

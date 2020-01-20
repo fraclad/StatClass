@@ -22,7 +22,6 @@ gt = g +  stat_ellipse(aes(color = SPECIES), type = "t", level=0.95)
 gt
 
 gtp = g + stat_ellipse(aes(fill=SPECIES),geom="polygon", alpha = 0.6,level=0.95)
-
 gtp
 
 # need some more packages
