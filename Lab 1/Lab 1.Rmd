@@ -50,10 +50,11 @@ paste('there are in total ', n_species, ' number of species')
 
 #the first subset is to gather SPECIES == LMBASS with weight > 800 gr
 subset_1 = ddt[ddt$SPECIES == "LMBASS" & ddt$WEIGHT > 800,]
+subset_1
 
 #the second subset is to gather RIVER == SCM with DDT > 4
 subset_2 = ddt[ddt$RIVER == "SCM" & ddt$DDT > 4.0,]
-
+subset_2
 ```
 
 ### CLICKER QUESTIONS

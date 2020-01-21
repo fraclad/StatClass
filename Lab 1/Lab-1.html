@@ -1511,7 +1511,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Lab 1</h1>
 <h4 class="author">Rahmat Ashari</h4>
-<h4 class="date">Jan 19, 2020</h4>
+<h4 class="date">Jan 20, 2020</h4>
 
 </div>
 
@@ -1560,9 +1560,17 @@ paste(&#39;there are in total &#39;, n_species, &#39; number of species&#39;)</c
 <pre><code>## [1] &quot;there are in total  3  number of species&quot;</code></pre>
 <pre class="r"><code>#the first subset is to gather SPECIES == LMBASS with weight &gt; 800 gr
 subset_1 = ddt[ddt$SPECIES == &quot;LMBASS&quot; &amp; ddt$WEIGHT &gt; 800,]
-
-#the second subset is to gather RIVER == SCM with DDT &gt; 4
-subset_2 = ddt[ddt$RIVER == &quot;SCM&quot; &amp; ddt$DDT &gt; 4.0,]</code></pre>
+subset_1</code></pre>
+<pre><code>##     RIVER MILE SPECIES LENGTH WEIGHT DDT
+## 141   TRM  345  LMBASS     30    856 2.2
+## 144   TRM  345  LMBASS     36   1433 1.9</code></pre>
+<pre class="r"><code>#the second subset is to gather RIVER == SCM with DDT &gt; 4
+subset_2 = ddt[ddt$RIVER == &quot;SCM&quot; &amp; ddt$DDT &gt; 4.0,]
+subset_2</code></pre>
+<pre><code>##    RIVER MILE  SPECIES LENGTH WEIGHT DDT
+## 16   SCM    1 CCATFISH     45    984 9.1
+## 17   SCM    1 CCATFISH     43    965 7.8
+## 18   SCM    1 CCATFISH     45   1084 4.1</code></pre>
 <div id="clicker-questions" class="section level3">
 <h3>CLICKER QUESTIONS</h3>
 <pre class="r"><code>&#39;Question 1&#39;</code></pre>
