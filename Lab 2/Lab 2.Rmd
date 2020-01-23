@@ -1,0 +1,93 @@
+---
+title: "Lab 2"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+```{r}
+
+getwd()
+
+```
+
+## Task 2
+```{r}
+
+data = read.csv("EPAGAS.csv")
+head(data)
+
+```
+
+## Task 3
+```{r}
+
+mpg = data[,1]
+
+z_mpg = (mpg - mean(mpg))/sd(mpg)
+#z_mpg
+
+mean_z = mean(z_mpg)
+stddev_z = sd(z_mpg)
+
+cat('The mean of z is ~', as.integer(mean_z), ' and the std dev for z is ', stddev_z, '. Hence, the values are verified with the reference given in the lab guideline.')
+
+#possible outliers. Defined as observations within z=2 and z=3 
+outl_pos = mpg[abs(z_mpg) >= 2 & abs(z_mpg) <= 3]
+
+#defined outliers. Defined as observations that lie z>3
+outl_def = mpg[abs(z_mpg)>3]
+
+cat('possible outlier(s) is(are) ', toString(outl_pos))
+cat('defined outlier(s) is(are) ', toString(outl_def))
+
+library(lattice)
+
+#The ifelse function works of vector, it automatically reiterates operation within the vector referenced
+color = ifelse(abs(z_mpg)>3, "red",
+        ifelse(abs(z_mpg)>=2 &abs(z_mpg)<=3,"blue", "black"))  
+
+dotplot(mpg, col = color, main ='dotplot for mpg data')
+
+```
+
+## Task 4
+```{r}
+
+library(dplyr)
+library(ggplot2)
+#help("boxplot")
+boxplot(mpg, col = 'black', notch = T, border = 'blue', main = 'mpg boxplot', horizontal = T)
+
+#Proportion of datat within 2 std dev with Cheby
+std2 = 1 - (1/2^2)
+cat('The proportion of mpg data within 2 std dev of the mean is at least ', std2, '\n')
+
+#Test Cheby accuracy
+upper = mean(mpg) + (2*sd(mpg))
+lower = mean(mpg) - (2*sd(mpg))
+len_std2 = length(mpg[mpg < upper & mpg > lower])
+true_prop = len_std2 / length(mpg)
+cat('the true proportion of mpg data within 2 std dev of the mean is ', true_prop, '\n')
+cat("Chebyshev's theorem does agree with mpg data because 0.75 <= 0.96", '\n')
+cat('according to the Empirical rule, about 95% of the data lies within 2 std dev of the mean', '\n')
+cat('analytically, ', true_prop, ' of the data lies within 2 std dev. Hence, the Empirical rule is quite well in discribing the data proportion', '\n')
+
+g = ggplot(data, aes(x = mpg)) +  geom_density(aes(mpg), fill = 'red', alpha = 0.5) + ggtitle("How does the mpg data distribution look like?")
+g
+
+cat("mpg data distribution seems to be 'mound-shaped' and is fairly symmetric. Thus, Empirical rule is valid")
+```
+
+
+
+
+
