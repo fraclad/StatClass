@@ -1,0 +1,52 @@
+---
+title: "Lab 3"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 7
+```{r}
+
+data = read.csv('SPRUCE.csv')
+x = data[,1]
+y = data[,2]
+library(ggplot2)
+
+# INPUTS
+inputPanel(
+  
+  
+  selectInput("plotg", "Choose plot type",
+      list(`points` = c("SLR", "Only Points", "Points + Line")
+      )
+    )
+)
+
+renderPlot({
+  
+ g = ggplot(data.frame(data), aes(x = BHDiameter, y = Height)) + ggtitle('Height vs Breast-height Diameter')
+
+ SLR = g + ggtitle('Height vs Breast-height Diameter: Simple Linear Regression') + geom_smooth(method = 'lm', se = F) #the 'se' controls the presence of the shade 
+ 
+ point_only = g + geom_point()  + ggtitle('Height vs Breast-height Diameter: Scatter plot')
+ 
+ point_line = g + geom_point() + geom_line()  + ggtitle('Height vs Breast-height Diameter: Connected points')
+  
+ if(input$plotg == "SLR") print(SLR) 
+ 
+ if(input$plotg == "Only Points") print(point_only)
+ 
+ if(input$plotg == "Points + Line") print(point_line)
+
+})
+
+```

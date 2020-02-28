@@ -1,0 +1,109 @@
+---
+title: 'Writing Functions: Class exercise'
+author: "Rahmat Ashari"
+date: "`r format(Sys.Date(), format='%B %d %Y')`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment='ws#')
+```
+
+# Introduction
+>
+We will be making R functions in this course and in fact the first project will require you to make a number of them.
+
+```{r,eval=FALSE}
+functionname <- function(x,y,z, ...){
+  R expressions
+  last line released to the command line
+}
+```
+
+
+# Task
+
+>
+You will need to make a function that takes a vector of quantitative data as input and then calculates the standard deviation.
+
+## Specifically
+
+Use the following formula:
+
+$$s = \sqrt{\frac{\sum_{i=1}^n (x_i-\bar{x})^2}{n-1}}$$
+
+1. Fill in the code below:
+
+```{r sd}
+
+mysd = function(x){ 
+  mean_x = mean(x)
+  n = length(x)
+  square_dif = c()
+  
+  for (i in 1:n){
+    square_dif <- append(square_dif, (x[i] - mean_x)^2)
+  }
+  
+  s = (sum(square_dif)/(n-1))^0.5
+  s
+}
+
+```
+
+2. Run the function with the following input. Notice the chunk option `eval=FALSE` -- you will need to remove this once your function is made.
+
+```{r test1}
+
+L=1:20
+mysd(L)
+
+```
+
+3. Now compare with the built in `R` function `sd()` by calculating the standard deviation of `L` : that is calculate `sd(L)`. Put in R chunk below
+
+```{r compare}
+
+cat("The std dev from user-made function 'mysd()' is ", mysd(L), 
+    " and the std dev from the prebuilt function sd() is ", sd(L))
+
+```
+
+
+4. This is important: Alter your function so that the last line before the `}` is a `list` function containing both the standard deviation and the variance.
+
+
+```{r,}
+
+mysd = function(x){ 
+  mean_x = mean(x)
+  n = length(x)
+  square_dif = c()
+  
+  for (i in 1:n){
+    square_dif <- append(square_dif, (x[i] - mean_x)^2)
+  }
+  
+  s = (sum(square_dif)/(n-1))^0.5
+  v = s^2
+  
+  list_sdvar <- list('std dev' = s, 'variance' = v)
+  list_sdvar
+    
+}
+
+```
+
+Invoke the adjusted function by first removing the chunk option `eval=FALSE`
+
+```{r, }
+
+mysd(x=L)
+
+```
+
+5. Upload the html document to CANVAS
+

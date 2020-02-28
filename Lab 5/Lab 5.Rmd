@@ -1,0 +1,245 @@
+---
+title: "Lab 5"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+```{r}
+
+getwd()
+
+```
+
+# Task 2
+```{r}
+
+mybin=function(iter,n,p, tabel_only = F){ 
+  
+  # make a matrix to hold the samples
+  #initially filled with NA's
+  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  #Make a vector to hold the number of successes in each trial
+  succ=c()
+  
+  for( i in 1:iter){
+    #Fill each column with a new sample
+    sam.mat[,i]=sample(c(1,0),n,replace=TRUE, prob=c(p,1-p))
+    #Calculate a statistic from the sample (this case it is the sum)
+    succ[i]=sum(sam.mat[,i])
+  }
+  
+  #Make a table of successes
+  succ.tab=table(factor(succ,levels=0:n))
+  #Make a barplot of the proportions
+  barplot(succ.tab/(iter), col=rainbow(n+1), xlab="Number of successes")
+  succ.tab/iter
+  
+  if (tabel_only == T){
+    dev.off()
+    succ.tab
+  } 
+  
+}
+
+#mybin(iter = 100, n = 10, p =0.7)
+trial = c(100, 200, 500, 1000, 10000)
+for (i in trial) {
+  mybin(i, n = 10, p = 0.7)
+  tex = paste('Binomial Distribution Simulation with p = 0.7 & Iterations =',as.character(i) )
+  title(tex)
+}
+
+tableSucc = mybin(10000, 10, 0.7, tabel_only = T)
+tableSucc
+yeet = as.data.frame(tableSucc)
+toShow = yeet[,2]
+
+#help("dbinom")
+tr = dbinom(1:11, 11, prob = 0.7)*10000
+
+#check simulation performace
+check = matrix(1:22, nr = 2, byrow = T)
+check[1,] = tr
+check[2,] = toShow
+row.names(check) = c('dbinom', 'simulation')
+check
+
+```
+
+Results from simulation and  dbinom are arguably close.
+
+# Task 3
+```{r}
+
+#20 marbles, 12 whites (denoted by 1) and 8 blacks (denoted by 0)
+marbles = c(1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0)
+
+#sampling without replacement
+sample(marbles, size = 5, replace = F)
+
+#sampling with replacement
+sample(marbles, size = 5, replace = T)
+
+myhyper = function(iter=100,N=20,r=12,n=5, label_only = F){
+  
+  # make a matrix to hold the samples
+  #initially filled with NA's
+  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  #Make a vector to hold the number of successes over the trials
+  succ=c()
+  
+  for( i in 1:iter){
+    #Fill each column with a new sample
+    sam.mat[,i]=sample(rep(c(1,0),c(r,N-r)),n,replace=FALSE)
+    #Calculate a statistic from the sample (this case it is the sum)
+    succ[i]=sum(sam.mat[,i])
+  }
+  
+  #Make a table of successes
+  succ.tab=table(factor(succ,levels=0:n))
+  #Make a barplot of the proportions
+  barplot(succ.tab/(iter), col=rainbow(n+1), xlab="Number of successes")
+  succ.tab/iter
+  
+  if (label_only == T){
+    dev.off()
+    succ.tab
+  }
+}
+
+for (i in trial) {
+  myhyper(iter = i, N=20,r=12,n=5, label_only = F)
+  tex = paste('HYPERGEOMETRIC Simulation with Iterations =',as.character(i) )
+  title(tex)
+}
+
+tableSuccH = myhyper(10000, N=20,r=12,n=5, label_only = T)
+tableSuccH
+
+hyperval = as.data.frame(tableSuccH)
+hyperval_show = hyperval[,2]
+
+trr = dhyper(1:6, 12, 8, 6)*10000
+
+#check simulation performace
+check2 = matrix(1:12, nr = 2, byrow = T)
+check2[1,] = trr
+check2[2,] = hyperval_show
+row.names(check2) = c('dhyper', 'simulation')
+check2
+
+```
+
+Values from simulation and dhyper are close, but not as great as binomial simuation. 
+
+# Task 4
+```{r}
+
+mysample = function(n, iter=10,time=0.5, one_only = F){ 
+  
+  #the addition of one_only input is to prevent the later sub task to show 30 plots. 
+  
+  if (one_only == F){
+    for( i in 1:iter){
+      #make a sample
+      s=sample(1:10,n,replace=TRUE)
+      # turn the sample into a factor
+      sf=factor(s,levels=1:10)
+      #make a barplot
+      barplot(table(sf)/n,beside=TRUE,col=rainbow(10), 
+              main=paste("Example sample()", " iteration ", i, " n= ", n,sep="") ,
+              ylim=c(0,0.2)
+      )
+      
+      #release the table
+      Sys.sleep(time)
+    }
+  } else {
+    s=sample(1:10,n,replace=TRUE)
+    sf=factor(s,levels=1:10)
+    barplot(table(sf)/n,beside=TRUE,col=rainbow(10), 
+              main=paste("Example sample()", " random iteration ", " n= ", n,sep="") ,
+              ylim=c(0,0.2))
+  }
+  
+}
+
+```
+
+The function mysample() generates n number of samples between the numeric 1 and 10, and plot their frequency iteration number of times. 
+
+```{r}
+
+mysample(n=1000, iter=30,time=1, one_only = T)
+
+```
+
+Each bin seems to have equal weight for each iteration. 
+
+# Task 5
+Calculate $$\binom{8}{4}$$
+```{r}
+
+choose(8,4)
+
+```
+
+
+Compute $$P(Y > 4), Y \sim Pois(\lambda = 2)$$
+```{r}
+
+res_pois = c()
+
+for (i in 0:4){
+  p = 2^i * (exp(-2)) / factorial(i)
+  res_pois = append(res_pois, p)
+}
+
+1 - sum(res_pois)
+```
+
+
+Compute $$P(Y = 10), Y \sim NegBin(p=0.4, r = 3)$$
+```{r}
+
+dnbinom(7,3,0.4)
+
+```
+
+
+
+Compute $$P(Y \leq 8), Y \sim Bin(n = 15, p =0.4)$$
+```{r}
+
+res = c()
+
+for (i in 0:8){
+  bino = choose(15, i)
+  cp = bino * (0.4^i) * ((1-0.4)^(15-i))
+  res = append(res, cp)
+}
+
+
+sum(res)
+```
+
+# Task 6
+```{r}
+
+library(math4753)
+
+#test using function with  default input values
+mybin(iter=100,n=10, p=0.5)
+
+```
+
+

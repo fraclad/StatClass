@@ -1,0 +1,335 @@
+---
+title: "Lab 4"
+author: "Rahmat Ashari"
+date: "2/3/2020"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+```{r}
+
+getwd()
+
+```
+
+
+
+# Task 2
+```{r}
+
+data = read.csv('SPRUCE.csv')
+tail(data)
+
+x = data[,1]
+y = data[,2]
+
+```
+
+
+# Task 3
+```{r}
+
+library(s20x)
+
+# Plot 1
+trendscatter(y~x, f = 0.5)
+
+spruce.lm = lm(y~x)
+
+height.res = residuals(spruce.lm)
+
+height.fit = fitted(spruce.lm)
+
+# Plot 2
+plot(height.res~height.fit, bg = 'Blue', pch = 21, cex = 1.2, main = 'scatter plot for residual vs fitted spruce dataset')
+
+# Plot 3
+trendscatter(height.res~height.fit)
+
+```
+
+Although pretty scattered, the residual vs fitted  lowess model looks like a quadratic function. The overall shape of this plot somewhat looks like the height vs BHDiameter plot with lowess regression but slightly stretched. 
+
+```{r}
+
+# Plot 4
+plot(y~x, bg = 'Blue', pch = 21, cex = 1.2, xlim = c(0,1.1*max(x)), ylim = c(0,1.1*max(y)), 
+    xlab = 'BHDiameter', ylab = 'Height', main = 'RSS')
+abline(spruce.lm)
+segments(x,y,x,height.fit)
+
+normcheck(spruce.lm, shapiro.wilk = TRUE)
+
+```
+
+From Shapiro-Wilk normality test, W = 0.9643 and P-value = 0.29. P-value > 0.05, accept NULL hypothesis. 
+
+With residual distribution plot above, we can see the distribution is not perfectly normal, it is slightly left skewed. However, the mean can be guessed to be around the middle value, which I assume to be 0. 
+
+Overall, applying simple linear regression to model hieght from breast-height diameter is not the worst modeling approach. 
+
+
+# Task 4
+```{r}
+
+quad.lm = lm(y~x + I(x^2))
+
+plot(y~x, bg = 'Blue', pch = 21, cex = 1.2, xlim = c(0,1.1*max(x)), ylim = c(0,1.1*max(y)), 
+    xlab = 'BHDiameter', ylab = 'Height', main = 'Quadratic Fit',)
+
+# create y = ... describing the quadratic fit
+myplot=function(x){
+ quad.lm$coef[1] +quad.lm$coef[2]*x  + quad.lm$coef[3]*x^2
+} 
+
+curve(myplot, lwd=2, col="red",add=TRUE)
+
+quad.fit = fitted(quad.lm)
+quad.res = residuals(quad.lm)
+
+plot(quad.res~quad.fit, bg = 'Blue', pch = 21, cex = 1.2, main = 'scatter plot for residual vs fitted for quadratic fit')
+
+normcheck(quad.lm, shapiro.wilk = T)
+
+```
+
+From Saphiro-Wilk test, the P-value is 0.684. Accept NULL hypothesis. 
+
+
+# Task 5
+
+```{r}
+
+summary(quad.lm)
+
+ciReg(quad.lm)
+
+```
+
+
+Point estimates for the βs, 
+
+$$\widehat{\beta _{0}} = 0.8609$$
+$$\widehat{\beta _{1}} = 1.4696$$
+$$\widehat{\beta _{2}} = -0.0275$$
+
+Interval estimates for the βs,
+
+$$-3.6253<\widehat{\beta _{0}}<5.3471$$
+
+$$0.9736<\widehat{\beta _{1}}<1.9656$$
+
+$$-0.0410<\widehat{\beta _{2}}<-0.0134$$
+
+
+The equation for the line is
+
+$$y = 0.8609 + 1.4696x - 0.0275x^2$$
+
+```{r}
+
+quad.pred = predict(quad.lm, data.frame( x = c(15, 18, 20)))
+quad.pred
+
+```
+
+From the linear regression, the prediction heights when BHDiameters are 15, 18, and 20 are 16.3690, 17.8134, and 18.7763 respectively (from lab 3). The predictions for similar set of BHDiameter provided by quadratic fit are higher. 
+
+
+Multiple R2 value for the quadratic fit is 0.7441 while the one provided by the linear fit is 0.6569. 
+
+
+The adjusted R2 value for the quadratic fit is 0.7604 while the one provided by the linear fit is 0.6468. The quadratic fit is relatively better than the linear regression model. 
+
+
+The Multiple R2 value is the ratio between the distance of modeled sum of squares *from the quadratic fit model* to the total sum of squares. This is slightly difference from Lab 3 multiple R2 because in this case, yhat is predicted using a quadratic model that involves extra term in the model as compared to linear model that only has 2 β terms. 
+
+The model that explains the most variability in the height is the quadratic fit. 
+
+```{r}
+
+anova(spruce.lm)
+
+anova(quad.lm)
+
+```
+
+Smaller residuals for the quadratic fit. Hence, quadratic fit is a better model. 
+
+
+```{r}
+
+yhat = fitted(quad.lm)
+
+MSS = sum((yhat - mean(y))^2)
+
+RSS = sum((y-yhat)^2)
+
+TSS = MSS + RSS
+
+#MSS
+#RSS
+#TSS
+#MSS/TSS
+
+```
+
+MSS = 215.9407
+
+RSS = 63.0068
+
+TSS = 278.9475
+
+MSS/TSS = 0.7741
+
+
+# Task 6
+```{r}
+
+cooks20x(quad.lm)
+
+```
+
+Observation number 24, 18, 21, and 29 are unusual, they have extremly high Cook's distance. 
+
+
+Cook's distance is a measure of how influential a data point (observation) is to the quality of linear regression. Observation with high Cook's distance can be a potential outliers. It tells us to what extent a linear model would be imporved had the data with high Cook's distance been removed. It has to be noted that Cook's distance is not only related to the residuals, but also other factors that affect the parameters of the regression model.
+
+
+Cook's distance for the quadratic model tells us which observations are influnetial to affect the quality of the quadratic fit model. 
+
+
+```{r}
+
+quad2.lm=lm(Height~BHDiameter + I(BHDiameter^2) , data= data[-24,])
+
+summary(quad2.lm)
+
+### This is not required in the assignment, I just want to see things
+plot(y~x, bg = 'Blue', pch = 21, cex = 1.2, xlim = c(0,1.1*max(x)), ylim = c(0,1.1*max(y)), 
+    xlab = 'BHDiameter', ylab = 'Height', main = 'Quadratic Fit with Most Influential Data Removed')
+
+myplot2=function(x){
+ quad2.lm$coef[1] +quad2.lm$coef[2]*x  + quad2.lm$coef[3]*x^2
+} 
+
+curve(myplot2, lwd=2, col="green",add=TRUE)
+curve(myplot, lwd=2, col="red",add=TRUE)
+```
+
+
+Comparing with the initial quadratic fit, β_0 changes significantly on the new quadratic fit with the removal of one data point that has the highest Cook's distance. 
+
+
+Judging from the R2 values (both multiple and adjusted), they are higher for the new quadratic fit model (quad2.lm). Hence, the removal of the most influential data from Cook's distance plot improves the model. 
+
+
+# Task 7
+
+The piecewise regression model is expressed by:
+
+$$y = \beta_{0} + \beta_{1}x + \beta_{2}(x-x_{k})I(x>x_{k})$$
+
+To prove this expression, we know that when x = xk, we can equate the expression describing the first and the second line. The expression of the second line, that is for x > xk, is simply an arithmetic modification of the expression for the first line (x < xk)
+
+$$\beta_{0} + \beta_{1}x_{x} = \beta_{0} + \delta + (\beta_{1} + \beta_{2})x$$
+$$\delta = - \beta_{2}x_{k}$$
+
+We also know the equation of line for x > xk,
+
+$$y = \beta_{0} + \delta + (\beta_{1} + \beta_{2})x$$
+
+Substituting this with previously derived expression 𝛿,
+
+$$y = \beta_{0} - \beta_{2}x_{k} + (\beta_{1} + \beta_{2})x$$
+
+Arithmetic readjustment of this expression gives
+
+$$y = \beta_{0} + \beta_{1}x + \beta_{2}(x-x_{k})$$
+
+Nonetheless, this equation is only true if x > xk. Furthermore, the only difference between this equation and the equation describing the first line for x < xk is simply the last term. Hence, adding an indicator function to the last term,
+
+$$ I(x > x_{k}) = \begin{cases} 1 & \text{ if } x>x_{k} \\ 0 & \text{ if } x\leq x_{k} \end{cases} $$
+
+Will activate the last term only when x > xk. If  x < xk, the indicator function will nullify the last term and we are back at the equation of a line for x < xk. 
+
+Hence, the addition of the indicator function generalizes the piecewise linear regression,
+
+$$y = \beta_{0} + \beta_{1}x + \beta_{2}(x-x_{k})I(x>x_{k})$$
+
+```{r}
+
+sp2.df=within(data, X<-(BHDiameter-20)*(BHDiameter>20)) # this makes a new variable and places it within the same df
+#sp2.df
+
+lmp=lm(Height~BHDiameter + X,data=sp2.df)
+tmp=summary(lmp)
+#names(tmp)
+myf = function(x,coef){
+  coef[1]+coef[2]*(x) + coef[3]*(x-18)*(x-18>0) #the last bracket item is an indicator function kinda
+}
+plot(data,main="Piecewise regression")
+myf(0, coef=tmp$coefficients[,"Estimate"])
+curve(myf(x,coef=tmp$coefficients[,"Estimate"] ),add=TRUE, lwd=2,col="Blue")
+abline(v=18)
+text(18,16,paste("R sq.=",round(tmp$r.squared,4) ))
+```
+
+# Task 8 
+
+```{r}
+
+library(math4753)
+
+
+#compute mean and std dev from a vector
+lab1(x)
+
+#compute z-score from a vector
+lab2(x)
+
+#compute RSS, MSS, and TSS
+lab3(x,y)
+
+
+plot(y~x)
+#add quadratic fit to plot
+lab4(x,y)
+
+```
+
+
+# Task ROCK N ROLL 
+
+Because why not
+
+```{r}
+
+plot(y~x, bg = 'Blue', pch = 21, cex = 1.2, xlim = c(0,1.1*max(x)), ylim = c(0,1.1*max(y)), 
+    xlab = 'BHDiameter', ylab = 'Height', main = 'Residuals for Quadratic Fit')
+curve(myplot, lwd=2, col="#1BD0DA",add=TRUE)
+
+yhatq = fitted(quad.lm)
+segments(x,y,x,yhatq)
+#help(text)
+text(x + 0.7 ,y ,labels = rownames(data), cex = 0.6)
+
+#help(arrows)
+
+arrows(x[24] - 5, y[24], x[24] - 0.5, y[24], angle = 20, length = 0.2, col = 'black')
+
+textc = "Highest Cook's \n distance"
+text(x[24] - 8.5, y[24],textc)
+
+#help(segments)
+segments(c(x[24], x[21], x[18]), c(y[24], y[21], y[18]), c(x[24], x[21], x[18]), c(yhatq[24], yhatq[21], yhatq[18]), col = 'red', lwd = 1.5)
+
+```
+

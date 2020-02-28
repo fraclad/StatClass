@@ -1,0 +1,566 @@
+---
+title: "Assignment 1"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Question 1
+
+The grading in this class will be distributed across several evaluations: Clicker questions (10%), labs (10%), chapter quizzes (5%), two projects (10%), two midterm exams (20%), assignments (15%), and final exam (30%).Final grades will use standard grading with A for an overall grade of >90%, B >80%, and C for >70% and failing grades for <70%. 
+
+# Question 2
+### a
+```{r}
+
+data = read.csv('DDT.csv')
+
+col_mile = factor(data[,'MILE'])
+
+coplot(LENGTH~WEIGHT|RIVER*SPECIES,data = data, col = col_mile)
+
+```
+
+### b
+The three lower left conditional plots suggest that: 
+
+  1) CCATFISH were gathered at one specific mile at each river. 
+  2) For CCATFISH found at FCM, LCM, and SCM rivers, the lenght seem to be affected by weight that can be modeled by linear model.
+
+
+### c
+Line #A ```m=with(ddt, as.numeric(factor(MILE)))``` categorizes the column 'MILE' from the ddt dataset (in this code I imported the dataset under the name 'data' not 'ddt') and store the data type as numeric. 
+
+### d
+Line #B ```length(unique(m))``` returns the number of unique category in variable m, which is the categorized column 'MILE' from the ddt dataset. 
+
+### e 
+The top six plots are empty because the species LMBASS and SMBUFFALO were not found in the rivers FCM, LCM, and SCM. 
+
+### f
+```{r}
+
+subset1 = data[data$SPECIES == 'CCATFISH' & data$RIVER == 'FCM', 'DDT']
+mean_q2 = mean(subset1)
+cat('The mean value of DDT found in the sample species of CCATFISH and river of FCM is', mean_q2)
+
+```
+The mean value of DDT found in the sample species of CCATFISH and river of FCM is 45.
+
+# Question 3
+
+a) length of max span = quantitative
+b) number of vehicle lanes = quantitative
+c) toll bridge (T or F) = qualitative
+d) average daily traffic = quantitative
+e) condition of deck = qualitative
+f) bypass or detour length = qunatitative
+g) route type = qualitative
+
+# Question 4
+
+### a
+4 names of random sampling designs:
+
+  1) simple random sample
+  
+  2) stratified random sampling
+  
+  3) cluster sampling
+  
+  4) systematic sampling
+
+
+### b
+ 
+Brief description of random sampling designs:
+
+  1) **simple random sample**: sampling a number of experimental units in a way that the probability of each element to be picked is ensured to be the same. 
+
+  2) **stratified random sampling**: sampling method where the experimental units are arranged into strata (groups that share similar characteristics) and a number of units then are picked from each strata and ultimately combined to form a representative set of samples.
+
+  3) **cluster sampling**: Experimental units are gathered from natural groupings (or clusters) to streamline the sampling process.
+
+  4) **systematic sampling**: This design systematically selects the *k*-th experimental unit from the list that consists all experimental units. This method is common in quality control practices. 
+  
+# Question 5
+```{r}
+
+mtbe = read.csv('MTBE.csv')
+head(mtbe)
+size_q5 = dim(mtbe)
+
+#the code below takes 5 random numbers from a vector with size size[1] without replacement. 
+ind_q5 = sample(1:size_q5 [1], 5, replace = F)
+#now to 'random sample' the mtbe df, just do simple indexing
+mtbe[ind_q5,]
+
+```
+
+### a-1)
+Remove rows/observations containing at least one NA 
+```{r}
+
+mtbeo = na.omit(mtbe)
+head(mtbeo)
+
+```
+
+### a-2)
+Compute the std dev of well depths that have 'Bedrock' as the aquifier *from the NA-omitted mtbe dataframe, which is mtbeo*
+```{r}
+
+depth = mtbeo[mtbeo$Aquifier == 'Bedrock', 'Depth']
+sd_q5 = sd(depth) 
+cat('The std dev of well depths that have bedrock as aquifier is', sd_q5)
+
+```
+
+# Question 6
+```{r}
+
+#Random sample of earthquake dataframe
+
+eq = read.csv('EARTHQUAKE.csv')
+size_q6 = dim(eq)
+ind_q6 = sample(1:size_q6[1], 5, replace = F)
+eq[ind_q6,]
+
+```
+
+### a-1)
+```{r}
+
+mag_conv = ts(eq$MAGNITUDE) #ts() converts numeric to a time series
+plot(mag_conv, xlab = 'aftershock detect time', ylab = 'magnitude', main = 'Aftershock Magnitude Observation', col = '#2AAAB1')
+
+```
+
+### a-2)
+```{r}
+
+median_q6 = median(eq$MAGNITUDE)
+cat('The median for the aftershock magnitudes is',median_q6)
+
+```
+
+
+# Question 7 
+
+### a
+The data collection method is a designed experiment, where fish specimen is gathered at various river and creek locations.
+
+### b 
+The population is all the fish in the Tennessee River and its tributary creeks
+
+### c
+The **qualitative** variables in this study are RIVER and SPECIES.
+
+
+# Question 8
+
+### a
+bar chart
+
+### b
+The variable measured is type of robotic limbs
+
+### c
+most used social robot design uses legs only
+
+### d
+```{r}
+
+freq = c(15, 8, 63, 20)
+rel_freq = freq/106
+rnames = c('None', 'Both', 'Legs ONLY', 'Wheels ONLY')
+
+data.frame(rel_freq, row.names = rnames)
+
+```
+
+### e
+```{r}
+
+pare_input = rep(rnames,freq)
+
+pareto <- function(x,mn="Pareto barplot",...){  # x is a vector
+  
+  x.tab=table(x)
+  xx.tab=sort(x.tab, decreasing=TRUE,index.return=FALSE)
+  cumsum(as.vector(xx.tab))->cs
+  length(x.tab)->lenx
+  bp<-barplot(xx.tab,ylim=c(0,max(cs)),las=2)
+  lb<-seq(0,cs[lenx],l=11)
+  axis(side=4,at=lb,labels=paste(seq(0,100,length=11),"%",sep=""),las=1,line=-1,col="Blue",col.axis="Red")
+  
+  for(i in 1:(lenx-1)){
+    segments(bp[i],cs[i],bp[i+1],cs[i+1],col=i,lwd=2)
+  }
+  title(main=mn,...)
+
+}
+
+pareto(pare_input)
+```
+
+
+# Question 9
+
+### a
+```{r}
+
+categ = c('Windows', 'Explorer', 'Office')
+categ_Issue = c(32, 6, 12)
+pie(categ_Issue, labels = categ, col = c('red', 'blue', 'green'))
+
+```
+
+From pie chart, Explorer has lowest proportion of security issues. 
+
+
+### b
+```{r}
+
+reper = c('denial of service', 'info discosure','remote code exec', 'spoofing', 'privilege elevation')
+reper_n = c(6,8,22,3,11)
+
+pare_input2 = rep(reper, reper_n)
+pareto(pare_input2)
+
+```
+
+Advise to focus on remote code execution.
+
+
+# Question 10 
+```{r}
+
+data10 = read.csv('SWDEFECTS.csv')
+head(data10)
+
+library(plotrix)
+
+tab = table(data10$defect)
+rtab = tab/sum(tab)
+#round(rtab,2)
+pie3D(rtab,labels=list("OK","Defective"),main="pie plot of SWD")
+
+```
+
+Although it is possible, it is unlikely that the software to be defective. 
+
+# Question 11
+
+### a
+```{r}
+
+data11 = read.csv('VOLTAGE.csv')
+#head(data11)
+
+oldvolt = data11[data11$LOCATION == 'OLD',]
+sort(oldvolt[,1])
+
+data11a = read.csv('Q11.csv')
+print(data11a)
+
+barplot(data11a$rel_freq, space = 0, ylab = 'rel frequency', names.arg = data11a$data.tab, main = 'voltage distribution for the old location', col = 'red')
+
+```
+
+
+### b 
+```{r}
+
+stem(oldvolt[,1])
+
+```
+
+The stem plot shows one peak, which if you only care about the mode, this might be a better plot. But I personally like the rel freq graph on **a** better because it shows not only where the mode is, but also the entire distribution of the data.
+
+
+### c
+```{r}
+
+newvolt = data11[data11$LOCATION == 'NEW',]
+sort(newvolt[,1])
+data11c = read.csv('Q11c.csv')
+print(data11c)
+barplot(data11c$rel_freq, space = 0, ylab = 'rel frequency', names.arg = data11c$data_tab, main = 'voltage distribution for the new location', col = 'blue')
+
+```
+
+
+### d
+```{r}
+
+barplot(data11a$rel_freq, space = 0, ylab = 'rel frequency', names.arg = data11a$data.tab, main = 'voltage distribution for the both locations', col=rgb(1,0,0,0.5))
+
+barplot(data11c$rel_freq, space = 0, add = T, col=rgb(0,0,1,0.5))
+
+```
+
+From the chart above and with definition of 'good' being voltage >= 9.2V, we see that most of the data from both locations lie above 9.2V. In short, local production is acceptable. Nonetheless, the old location seems to produce more with greater voltage, which is better. 
+
+### e
+```{r}
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+meanOld = mean(oldvolt[,1])
+medianOld = median(oldvolt[,1])
+modeOld = Mode(oldvolt[,1])
+
+meanOld
+medianOld 
+modeOld
+
+meanNew = mean(newvolt[,1])
+medianNew = median(newvolt[,1])
+modeNew = Mode(newvolt[,1])
+
+meanNew
+medianNew
+modeNew
+
+```
+
+The difference between the mean and the median is not significant for both locations. Additionally, the data distribution seems to contain most of the observations with close proximitiy to the mean. Hence, mean seems to be a better measure of central tendency. 
+
+### f
+```{r}
+
+z_old_f = (10.5 - meanOld) / sd(oldvolt[,1])
+z_old_f
+
+```
+
+### g
+```{r}
+
+z_new_g = (10.5 - meanNew) /sd(newvolt[,1])
+z_new_g
+
+```
+
+### h 
+
+Based on **f** and **g**, the voltage reading of 10.5V is more likely to occur in the old location. This is because the Z score is lower for the old location with respect to this reading, meaning its colser to the mean and has higher probability to occur at the old location. 
+
+### i
+```{r}
+
+boxplot(oldvolt[,1], ylab = 'voltage', col = 'red', horizontal = T, main = 'Voltage Readings at Old Location')
+
+```
+
+Yes, there seems to be some outliers as seen from the dotplot. 
+
+### j
+```{r}
+
+z_old = (oldvolt[,1] - meanOld) / sd(oldvolt[,1])
+z_old
+
+old_detect = oldvolt[,1]
+# Potential Outliers
+print(old_detect[abs(z_old) > 2])
+# Outliers
+print(old_detect[abs(z_old) > 3])
+
+```
+
+
+### k
+```{r}
+
+boxplot(newvolt[,1], ylab = 'voltage', col = 'blue', horizontal = T, main = 'Voltage Readings at New Location')
+
+```
+
+The boxplot shows no radical outliers, but maybe some *potential* outliers
+
+### l 
+```{r}
+
+z_new = (newvolt[,1] - meanNew) / sd(newvolt[,1])
+z_new
+
+new_detect = newvolt[,1]
+# Potential outliers
+print(new_detect[abs(z_new) > 2])
+# Outlier
+print(new_detect[abs(z_new) > 3])
+
+```
+
+z-score method shows no outlier for the new location voltage readings
+
+### m
+```{r}
+
+box_join = data.frame("Old" = oldvolt[,1], "New" = newvolt[,1])
+
+boxplot(box_join, col = c('red','blue'), main = 'Comparison between Old and New Voltage Readings', ylab = 'Voltage')
+
+```
+
+
+
+# Question 12
+```{r}
+
+library(ggplot2)
+data12 = read.csv('ROUGHPIPE.csv')
+
+hist(data12[,1])
+
+g12 = ggplot(data12, aes(x = ROUGH)) + geom_density(aes(fill = 'red'))
+g12
+
+```
+
+As we can see, the data is not normally distributed (not mound shape and not symmetric). Hence, we cannot use the empirical rule to estimate interval containing 95% of the data. Therefore, attempt to estimate interval likely to contain 95% of the data using Chebyshev's rule. 
+
+$$N \geq 1 -\frac{1}{k^2} $$
+
+When k = 3, at least 89% of the data is contained within 3 std dev of the mean. This is very close to 95%. 
+
+```{r}
+
+mean12 = mean(data12[,1])
+sd12 = sd(data12[,1])
+
+mean12
+3*sd12
+
+```
+
+Therefore, the interval likely to contain 95% of the data is
+$$ x = 1.881 \pm 1.572 $$
+
+# Question 13
+## a
+```{r}
+
+data13 = read.csv('GOBIANTS.csv')
+mean13 = mean(data13$AntSpecies)
+median13 = median(data13$AntSpecies)
+
+
+mode13 = Mode(data13$AntSpecies)
+
+mean13
+median13
+mode13
+```
+
+The mean is 12.8182 and the median and mode are 5. 
+
+## b 
+
+Median seems to be a better measure of central tendency because some observation has erronously high number of species. Median is not sensitive to outliers. 
+
+## c
+```{r}
+
+drycover = data13$PlantCov[data13$Region == "Dry Steppe "]
+meanDry = mean(drycover)
+medianDry = median(drycover)
+modeDry = Mode(drycover)
+
+meanDry
+medianDry
+modeDry
+
+```
+
+The mean of plant cover percentage for Dry Steppe region only is 40.4% while the median and the mode are both 40%.
+
+## d
+```{r}
+
+gobicover = data13$PlantCov[data13$Region == "Gobi Desert"]
+meanGob = mean(gobicover)
+medianGob = median(gobicover)
+modeGob = Mode(gobicover)
+
+meanGob
+medianGob
+modeGob
+
+```
+
+The mean of plant cover percentage for Gobi Desert region only is 28, the median is 26, and the mode is 30. 
+
+## e
+
+Judging solely by total plant coverage, the center of plant cover percentage distribution from **d** and **c** suggests that they are distinct.  
+
+# Question 14
+
+## a
+```{r}
+
+velo = read.csv('GALAXY2.csv')
+hist(velo[,1], col = 'steelblue')
+#d = ggplot(velo, aes(x = velo[,1])) + geom_histogram(binwidth = 200)
+#d
+```
+
+
+Data distribution seems bimodal. Two peaks are observed, one at around 19500 km/s and the other at 22500 km/s. 
+
+## b 
+
+The apparent bimodal nature of the data suggests the presence of two different velocities, which implies the existence of more than one galaxies. Hence, the data distribution supports the idea of double cluster. 
+
+## c
+```{r}
+
+# Assuming double cluster, i set a treshold at 21000 km/s to distinguish the two clusters
+# so A1775A has velocity < 21000 km/s and A1775B has volocity >= 21000 km/s
+
+gal_a = velo[velo[,1] < 21000,]
+gal_b = velo[velo[,1] >= 21000,]
+
+meanA = mean(gal_a)
+sdA = sd(gal_a)
+
+meanB = mean(gal_b)
+sdB = sd(gal_b)
+
+meanA
+sdA
+meanB
+sdB
+```
+
+For cluster A1775A, the mean velocity is 19462.24 km/s and its std dev is 532.2868 km/s while for cluster A1775B, the mean velocity is 22838.47 km/s and its std dev is 560.9767 km/s. 
+
+## d
+
+A galaxy with a velocity of 20000 km/s will likely to belong to A1775A (the one with lower velocities) because the 20000 km/s is approximately within one std dev of the mean of A1775A. 
+
+
+# Question 15
+```{r}
+
+g = ggplot(data = data, aes(x = RIVER, y = LENGTH)) + geom_boxplot(aes(fill = SPECIES)) + ggtitle('Rahmat Ashari')
+g
+
+```
+
+

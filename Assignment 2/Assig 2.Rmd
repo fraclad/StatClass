@@ -1,0 +1,388 @@
+---
+title: "Assignment 2"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1, MS 3.36
+```{r}
+
+result = matrix(1:6, nrow = 3, byrow = T)
+row.names(result) = c('Match', 'Similar Distracter', 'Non-similar Distracter')
+colnames(result) = c('Experts', 'Novices')
+result[1:6] = c(92.12,99.32,100,74.55,44.82,77.03)
+result
+
+```
+
+### a
+```{r}
+
+1-0.9212
+
+```
+
+### b 
+```{r}
+
+1-0.7455
+
+```
+
+### c
+```{r}
+
+P_expertFail = 0.5 * 0.0788
+P_expertFail
+
+P_noviceFail = 0.5*0.2545
+P_noviceFail
+
+```
+
+Participant is more likely a novice.
+
+# Question 2, MS 3.52
+
+### a
+```{r}
+
+#P(+|user)
+50/100
+
+```
+
+### b
+```{r}
+
+#P(-|non-user)
+(900-9)/900
+
+```
+
+### c
+```{r}
+
+#Probability of positive test given non user
+P_false = (9/900)
+
+round((0.1*0.5)/((0.1*0.5) + (0.9*P_false)), 4)
+
+```
+
+# Question 3, Proof: Multiplicative 
+
+Suppose we have *k* sets of elements, and for simplicity lets define k=2 containing n samples of a and n samples of b. The possible number of samples that can be formed with a and b is:
+
+```{r}
+
+multProof = matrix(1:9, nrow = 3, byrow = T)
+row.names(multProof) = c('a1','a2','an')
+colnames(multProof) = c('b1','b2','bn')
+multProof[1:9] = c('a1b1','a2b1','anb1','','','','','','anbn')
+multProof
+
+```
+
+for this configuration k=2, we have n_a x n_b possible samples that can be formed. For k=3, we can extend the grid shown above into 3-dimension, with the extra dimension is due to the additional n number of *c* samples. Ultimately, for k=3, there are n_a x n_b x n_c possible different samples. By induction, for greater k, we will have n_a x n_b x ... n_n possible different samples, which is the multiplicative rule .
+
+# Question 4, Proof: Permutation
+
+In permutation, the order matters. Suppose for event 1, we have N number of ways of choosing samples and we take one sample out. For event 2, we have (N-1) ways of choosing samples and we take another one out. The number of ways of choosing samples for event 2 can also be denoted by (N-2+1), where the 2 is the event number. By induction, for event n, we will have (N-n + 1) ways of choosing samples. Therefore, for the entire process, we can apply the multiplicative rule to fine the total ways in which we can select the samples:
+
+$$ _{n}^{N}\textrm{P} = (N)(N-1)(N-2)...(N-n+1) = \frac{N!}{(N-n)!} $$
+
+# Question 5, Proof: Partition
+
+Suppose X to be the number of ways we can partition N into k sets. The number of ways we can arrange N is simply the permutation with n = N. 
+
+$$ _{N}^{N}\textrm{P} = \frac{N!}{(N-N)!} = N! $$
+
+But, we can also express N! in terms of X with the multiplicative rule.
+
+$$ N! = (X)*(n_1!)(n_2!)...(n_k!)$$
+
+With the two expressions above, we can express the number of partition X as
+
+$$ X = \frac{N!}{(n_1!)(n_2!)...(n_k!)} $$
+
+# Question 6, Proof: Combination
+
+Combination deals with how many ways can be done for n elements to be chosen from N samples. This is similar to partitioning N samples into two groups: one with n element and another one with (N-n) elements. By partition rule, this can be expressed by
+
+$$ \frac{N!}{(n!)(N-n)!} = \binom{N}{n} $$
+
+# Question 7, MS 4.2
+```{r}
+
+tab7 = matrix(1:5, nrow = 1)
+row.names(tab7) = 'p(y)'
+colnames(tab7) = c(0,1,2,3,4)
+tab7[1:5] = c(0.09, 0.3, 0.37, 0.2, 0.04)
+tab7
+
+```
+
+
+### a 
+```{r}
+
+sum_prob = sum(tab7)
+sum_prob
+
+```
+
+### b 
+```{r}
+
+#p(3) or p(4)
+0.2 + 0.04
+
+```
+
+### c
+```{r}
+
+#p(<2) = p(0) + p(1)
+0.09 + 0.3
+
+```
+
+# Question 8, MS 4.12
+```{r}
+
+tab8 = matrix(1:42, ncol = 2)
+colnames(tab8) = c('number of apps used, y', 'p(y)')
+tab8[,1] = 0:20
+tab8[,2] = c(0.17,0.10, 0.11,0.11,0.10,0.10,0.07,0.05,0.03,0.02,0.02,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.01,0.005,0.005)
+tab8
+
+```
+
+### a
+
+The properties of discreet random variable are:
+
+>
+  1.  The probability is between 0 and 1. This is apparent in column p(y)
+  2. 
+  
+  $$ \sum_{i}^{N} p_i(y) = 1 $$
+  
+>
+  For the given data, 
+  
+```{r}
+
+sum(tab8[,2])
+
+```
+
+>
+  Hence, the second property is satisfied
+  
+### b 
+```{r}
+
+# p(Y >= 10) 
+sum(tab8[11:21,2])
+
+```
+
+### c
+The mean
+```{r}
+
+#mean
+mean8 = c()
+for (i in 1:21){
+  mean8 = append(mean8, tab8[i,1] * tab8[i,2])
+}
+
+meanReal = sum(mean8)
+meanReal
+```
+
+
+The variance
+```{r}
+# variance
+var8 = c()
+for (i in 1:21){
+  var8 = append(var8, (tab8[i,2])*(tab8[i,1]-meanReal)^2)
+}
+
+varReal = sum(var8)
+varReal
+```
+
+### d
+```{r}
+
+sum(tab8[1:7,2])
+
+```
+
+
+# Question 9, MS 4.34
+
+### a
+```{r}
+
+#help(pbinom)
+pbinom(10, 25, 0.7)
+
+```
+
+### b
+```{r}
+
+dbinom(5, 25, 0.7)
+
+```
+
+### c
+```{r}
+
+#mean
+0.7*25
+
+```
+
+```{r}
+
+#standard dev = sqrt of var
+std = (0.7*25*0.3)^0.5
+std
+
+```
+
+
+### d
+
+out of 25 random students who just earned PhD in Engineering, about 15-19 people are expected to be foreign nationals.
+
+
+# Question 10, MS 4.46
+
+### a
+```{r}
+
+#help("dmultinom")
+dmultinom(c(5,5,5,5,5,5,5,5,5,5), size = 50, c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1))
+
+```
+
+### b
+```{r}
+
+dbinom(0,50,0.1) + dbinom(1,50,0.1)
+
+```
+
+# Question 11, MS 4.54
+```{r}
+
+tab11 = matrix(1:6, ncol = 1)
+tab11[1:6] = c(45,15,12,6,4,18)
+colnames(tab11) = '% of consumer'
+row.names(tab11) = c('Certification mark on label','Packaging','Reading info about the product', 'Ads', 'Brand web','Other')
+tab11
+
+```
+
+### a
+
+Negative Binomial 
+
+$$ P(y) = \binom{y-1}{r-1}p^rq^{y-r}$$
+Here, r = 1. For something **other than** information given directly on product label **or** packaging, probability p is 
+
+```{r}
+
+0.12 + 0.06 + 0.04 + 0.18
+
+```
+
+Hence, the formula for the probability distribution becomes geometric
+
+$$ P(y) = 0.4*0.6^{y-1}$$
+
+### b 
+```{r}
+
+#expected value or mean is 
+1/0.4
+
+```
+
+This means, it takes about 3 people to find someone who identifies 'green' products by refering through means other than direct label and packaging.
+
+
+### c 
+```{r}
+
+#P(Y = 1)
+0.4 * 0.6^(1-1)
+
+```
+
+
+### d
+```{r}
+
+#P(>2) = 1 - P(<=2) = 1 - (P(1) + P(2))
+1 - ((0.4*0.6^(1-1)) + (0.4*0.6^(2-1)))
+
+```
+
+
+# Question 12, MS 4.66
+
+### a
+```{r}
+
+p12 = (8/209)
+Ex = 10*p12
+Ex
+
+```
+
+a random sample of 10 facilities does not present any facility that treats hazardous waste on-site
+
+### b 
+```{r}
+
+dhyper(4,8,201,10)
+
+```
+
+# Question 12, MS 4.78
+
+### a
+
+For Poisson distribution, the mean or E(Y) is the same as lambda and variance. Hence, the variance is 0.03
+
+### b
+
+> 
+  1. constant rate lambda
+  2. any casualty does not affect the probability of the upcoming potential casualties
+
+### c
+```{r}
+
+ppois(0, 0.03)
+
+```
+
+

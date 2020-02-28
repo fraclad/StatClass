@@ -1,0 +1,41 @@
+---
+title: "In Class Practice"
+author: "Rahmat Ashari"
+date: "2/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+#normal distribution
+res = 1 - pnorm(8, mean = 10, sd = 2)
+res
+
+```
+
+```{r}
+
+#discreet binomial
+resd = 1 - pbinom(7, size = 10, prob = 0.7)
+resd
+
+```
+
+```{r}
+
+qnorm(0.9, 3, 0.5)
+
+```
+
+```{r}
+
+qnorm(0.75,0,1) - qnorm(0.25,0,1)
+
+```
+
+
