@@ -9,6 +9,8 @@ output:
 
 ---
 
+Completed Questions = 17/17
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -239,14 +241,14 @@ sum(tab8[1:7,2])
 ```{r}
 
 #help(pbinom)
-pbinom(10, 25, 0.7)
+dbinom(10, 25, 0.7)
 
 ```
 
 ### b
 ```{r}
 
-dbinom(5, 25, 0.7)
+pbinom(5, 25, 0.7)
 
 ```
 
@@ -366,7 +368,7 @@ dhyper(4,8,201,10)
 
 ```
 
-# Question 12, MS 4.78
+# Question 13, MS 4.78
 
 ### a
 
@@ -385,4 +387,171 @@ ppois(0, 0.03)
 
 ```
 
+
+# Question 14, MS 5.2
+
+### a
+```{r}
+
+f = function(x){
+  2-x
+}
+
+integrate(f, lower = 0, upper = 1)
+
+c = 1/1.5
+c
+
+```
+
+
+### b 
+
+$$ F(y) = \int_{0}^{y} \frac{1}{1.5}(2-y) dy $$
+$$ F(y) = \frac{1}{1.5}(2y - \frac{y^2}{2}) $$
+
+### c
+```{r}
+
+f = function(x){
+  (1/1.5)*(2*x - ((x^2)/2))
+}
+
+#F(0.4)
+f(0.4)
+
+```
+
+
+### d
+```{r}
+
+#P(0.1 <= y <= 0.6)
+f(0.6) - f(0.4)
+
+```
+
+
+# Question 15, MS 5.10
+
+### a
+```{r}
+
+f = function(x){
+  (3/500)*(25 - x^2)*x
+}
+
+#mean
+integrate(f, lower = -5, upper = 5)
+
+```
+
+```{r}
+
+#variance
+f = function(x){
+  (3/500)*(25 - x^2)*x^2
+}
+
+secMom = integrate(f, lower = -5, upper = 5)
+#secMom 
+
+var = 5- 0
+var
+
+```
+
+### b 
+
+mean (in hrs) = 0.0000
+
+variance (in hrs)
+```{r}
+
+(1/60)^2 * 5
+
+```
+
+### c
+
+mean (in sec) = 0
+
+variance (in sec)
+```{r}
+
+(60^2) * 5
+
+```
+
+
+# Question 16, MS 5.36
+
+### a
+```{r}
+
+mean16 = 50
+stddev16 = 3.2
+# assumed normally distributed
+
+#P(x> 45)
+1 - pnorm(45, mean = mean16, sd = stddev16)
+
+```
+
+
+### b
+```{r}
+
+#P(x<55)
+pnorm(55, mean = mean16, sd = stddev16)
+
+```
+
+
+### c
+```{r}
+
+#P(51 < x < 52)
+pnorm(52, mean = mean16, sd = stddev16) - pnorm(51, mean = mean16, sd = stddev16)
+
+```
+
+
+# Question 17, MS 5.38
+
+### a
+```{r}
+
+mean17 = 605
+stddev17 = 185
+# data is normally distirbuted
+
+#P(500 < x < 700)
+pnorm(700, mean = mean17, sd = stddev17) - pnorm(500, mean = mean17, sd = stddev17)
+
+```
+
+### b 
+```{r}
+
+#P(400 < x < 500)
+pnorm(500, mean = mean17, sd = stddev17) - pnorm(400, mean = mean17, sd = stddev17)
+
+```
+
+### c
+```{r}
+
+#P(x < 850)
+pnorm(850, mean = mean17, sd = stddev17)
+
+```
+
+### d
+```{r}
+
+#what rating will only 10% test exceed?
+qnorm(0.9, mean = mean17, sd = stddev17)
+
+```
 

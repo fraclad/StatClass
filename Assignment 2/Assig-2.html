@@ -1511,11 +1511,12 @@ div.tocify {
 
 <h1 class="title toc-ignore">Assignment 2</h1>
 <h4 class="author">Rahmat Ashari</h4>
-<h4 class="date">Feb 27, 2020</h4>
+<h4 class="date">Feb 28, 2020</h4>
 
 </div>
 
 
+<p>Completed Questions = 17/17</p>
 <div id="question-1-ms-3.36" class="section level1">
 <h1>Question 1, MS 3.36</h1>
 <pre class="r"><code>result = matrix(1:6, nrow = 3, byrow = T)
@@ -1720,13 +1721,13 @@ varReal</code></pre>
 <div id="a-4" class="section level3">
 <h3>a</h3>
 <pre class="r"><code>#help(pbinom)
-pbinom(10, 25, 0.7)</code></pre>
-<pre><code>## [1] 0.001778405</code></pre>
+dbinom(10, 25, 0.7)</code></pre>
+<pre><code>## [1] 0.001324897</code></pre>
 </div>
 <div id="b-4" class="section level3">
 <h3>b</h3>
-<pre class="r"><code>dbinom(5, 25, 0.7)</code></pre>
-<pre><code>## [1] 3.113545e-07</code></pre>
+<pre class="r"><code>pbinom(5, 25, 0.7)</code></pre>
+<pre><code>## [1] 3.457444e-07</code></pre>
 </div>
 <div id="c-4" class="section level3">
 <h3>c</h3>
@@ -1816,8 +1817,8 @@ Ex</code></pre>
 <pre><code>## [1] 0.0001688459</code></pre>
 </div>
 </div>
-<div id="question-12-ms-4.78" class="section level1">
-<h1>Question 12, MS 4.78</h1>
+<div id="question-13-ms-4.78" class="section level1">
+<h1>Question 13, MS 4.78</h1>
 <div id="a-8" class="section level3">
 <h3>a</h3>
 <p>For Poisson distribution, the mean or E(Y) is the same as lambda and variance. Hence, the variance is 0.03</p>
@@ -1835,6 +1836,135 @@ Ex</code></pre>
 <h3>c</h3>
 <pre class="r"><code>ppois(0, 0.03)</code></pre>
 <pre><code>## [1] 0.9704455</code></pre>
+</div>
+</div>
+<div id="question-14-ms-5.2" class="section level1">
+<h1>Question 14, MS 5.2</h1>
+<div id="a-9" class="section level3">
+<h3>a</h3>
+<pre class="r"><code>f = function(x){
+  2-x
+}
+
+integrate(f, lower = 0, upper = 1)</code></pre>
+<pre><code>## 1.5 with absolute error &lt; 1.7e-14</code></pre>
+<pre class="r"><code>c = 1/1.5
+c</code></pre>
+<pre><code>## [1] 0.6666667</code></pre>
+</div>
+<div id="b-9" class="section level3">
+<h3>b</h3>
+<p><span class="math display">\[ F(y) = \int_{0}^{y} \frac{1}{1.5}(2-y) dy \]</span> <span class="math display">\[ F(y) = \frac{1}{1.5}(2y - \frac{y^2}{2}) \]</span></p>
+</div>
+<div id="c-7" class="section level3">
+<h3>c</h3>
+<pre class="r"><code>f = function(x){
+  (1/1.5)*(2*x - ((x^2)/2))
+}
+
+#F(0.4)
+f(0.4)</code></pre>
+<pre><code>## [1] 0.48</code></pre>
+</div>
+<div id="d-3" class="section level3">
+<h3>d</h3>
+<pre class="r"><code>#P(0.1 &lt;= y &lt;= 0.6)
+f(0.6) - f(0.4)</code></pre>
+<pre><code>## [1] 0.2</code></pre>
+</div>
+</div>
+<div id="question-15-ms-5.10" class="section level1">
+<h1>Question 15, MS 5.10</h1>
+<div id="a-10" class="section level3">
+<h3>a</h3>
+<pre class="r"><code>f = function(x){
+  (3/500)*(25 - x^2)*x
+}
+
+#mean
+integrate(f, lower = -5, upper = 5)</code></pre>
+<pre><code>## 0 with absolute error &lt; 2.1e-14</code></pre>
+<pre class="r"><code>#variance
+f = function(x){
+  (3/500)*(25 - x^2)*x^2
+}
+
+secMom = integrate(f, lower = -5, upper = 5)
+#secMom 
+
+var = 5- 0
+var</code></pre>
+<pre><code>## [1] 5</code></pre>
+</div>
+<div id="b-10" class="section level3">
+<h3>b</h3>
+<p>mean (in hrs) = 0.0000</p>
+<p>variance (in hrs)</p>
+<pre class="r"><code>(1/60)^2 * 5</code></pre>
+<pre><code>## [1] 0.001388889</code></pre>
+</div>
+<div id="c-8" class="section level3">
+<h3>c</h3>
+<p>mean (in sec) = 0</p>
+<p>variance (in sec)</p>
+<pre class="r"><code>(60^2) * 5</code></pre>
+<pre><code>## [1] 18000</code></pre>
+</div>
+</div>
+<div id="question-16-ms-5.36" class="section level1">
+<h1>Question 16, MS 5.36</h1>
+<div id="a-11" class="section level3">
+<h3>a</h3>
+<pre class="r"><code>mean16 = 50
+stddev16 = 3.2
+# assumed normally distributed
+
+#P(x&gt; 45)
+1 - pnorm(45, mean = mean16, sd = stddev16)</code></pre>
+<pre><code>## [1] 0.9409149</code></pre>
+</div>
+<div id="b-11" class="section level3">
+<h3>b</h3>
+<pre class="r"><code>#P(x&lt;55)
+pnorm(55, mean = mean16, sd = stddev16)</code></pre>
+<pre><code>## [1] 0.9409149</code></pre>
+</div>
+<div id="c-9" class="section level3">
+<h3>c</h3>
+<pre class="r"><code>#P(51 &lt; x &lt; 52)
+pnorm(52, mean = mean16, sd = stddev16) - pnorm(51, mean = mean16, sd = stddev16)</code></pre>
+<pre><code>## [1] 0.1113448</code></pre>
+</div>
+</div>
+<div id="question-17-ms-5.38" class="section level1">
+<h1>Question 17, MS 5.38</h1>
+<div id="a-12" class="section level3">
+<h3>a</h3>
+<pre class="r"><code>mean17 = 605
+stddev17 = 185
+# data is normally distirbuted
+
+#P(500 &lt; x &lt; 700)
+pnorm(700, mean = mean17, sd = stddev17) - pnorm(500, mean = mean17, sd = stddev17)</code></pre>
+<pre><code>## [1] 0.4110396</code></pre>
+</div>
+<div id="b-12" class="section level3">
+<h3>b</h3>
+<pre class="r"><code>#P(400 &lt; x &lt; 500)
+pnorm(500, mean = mean17, sd = stddev17) - pnorm(400, mean = mean17, sd = stddev17)</code></pre>
+<pre><code>## [1] 0.1512568</code></pre>
+</div>
+<div id="c-10" class="section level3">
+<h3>c</h3>
+<pre class="r"><code>#P(x &lt; 850)
+pnorm(850, mean = mean17, sd = stddev17)</code></pre>
+<pre><code>## [1] 0.9073023</code></pre>
+</div>
+<div id="d-4" class="section level3">
+<h3>d</h3>
+<pre class="r"><code>#what rating will only 10% test exceed?
+qnorm(0.9, mean = mean17, sd = stddev17)</code></pre>
+<pre><code>## [1] 842.087</code></pre>
 </div>
 </div>
 
