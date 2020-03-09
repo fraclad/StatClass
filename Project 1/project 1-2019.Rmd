@@ -1,0 +1,218 @@
+---
+title: "Project 1"
+author: "Rahmat Ashari"
+date: "`r format(Sys.time(), format = '%b %d, %Y')`"
+output:
+  html_document:
+    code_folding: show
+    csl: biomed-central.csl
+    df_print: paged
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    number_sections: yes
+    theme: journal
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+    toc_depth: '4'
+  pdf_document:
+    df_print: kable
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    toc: yes
+    toc_depth: 4
+#bibliography: project.bib
+
+abstract: "This project objective was to analyze the SWDEFECTS file using R and probability theory. There were four metrics being examined to evaluate software defects: lines of codes, cyclomatic complexity, essential complexity, and design complexity. For each of this metrics, their accuracy, detection rate, false alarm rate, and precision were computed using probability theory. Ultimately, a function was defined to visualize and summarize the assessment of each method. All of the metrics were about 85% accurate with false alarm detection rate less than 20%. Precision ranged between 20-30%. Essential complexity has the highest accuracy but lowest detection rate. Line of code is arguably the best metric to evaluate software defects"
+---
+
+<center>
+<br>
+<br>
+
+![me lol](C:\Users\ra\OneDrive - University of Oklahoma\Applied Statistical Methods\me.jpg){width=30%}
+
+
+</center>
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction to the Data
+
+In this section, the data invovled will be described and the variables used for future computations wil be defined. 
+
+## Data and variables 
+
+The SWDEFECTS dataset includes variables that correspond to the metrics used for detecting software defects, with the hope to minimize the possibility of encountering 'blind spots' in software evaluation. These metrics were applied to 498 modules of software code written in *C* for NASA spacecraft instrument. 
+
+## Summary Table and Convention
+
+**The summary table **
+
+|            |    | Defects False    | Defects True    |
+|------------|----|------------------|-----------------|
+|Algorithm   |No  |a                 |b                |
+|Predicts    |Yes |c                 |d                |
+|Defects     |    |                  |                 |
+
+With the table above defining each variables, we can calculate a number of probabilities that describe the quality and performance of each method to detect software defects:
+
+1. Accuracy
+
+$$ P(Algorithm \ is \  correct) = \frac{(a+d)}{(a+b+c+d)} $$
+2. Detection rate
+
+$$ P(predict \ defect \ | \ module \ has \ defect) = \frac{d}{(b+d)}$$
+
+3. False alarm rate
+
+$$ P(predict \ defect \ | \ module \ has \ no \ defect) = \frac{c}{(c+a)} $$
+
+4. Precision
+
+$$ P(module  \ has \ defect \ | \ predict \ defect) = \frac{d}{(c+d)} $$
+
+# R Functions
+
+The following R chunks create the abovementioned probability functions in R for future use conviniences
+
+1. Accuracy
+
+```{r accuracy}
+acc=function(a,b,c,d)
+{
+  return ((a + d)/(a + b + c + d))
+}
+```
+
+2. Detection rate
+
+```{r detecton}
+detect=function(b,d)
+{
+  return ((d) / (b + d))
+}
+```
+
+3. False alarm rate
+
+```{r alarm}
+falarm=function(a,c)
+{
+  return ((c) / (a + c))
+}
+```
+
+4. Precision
+
+```{r precision}
+prec=function(c,d)
+{
+  return ((d) / (c + d))
+}
+```
+
+
+# Two-way Summary Tables for Each Method
+
+In this section, we need to examine the number of true detect and non detect as described in the summary table for each method. Four metrics are used: lines of codes (LOC), cyclomatic complexity (VG), essential complexity (EVG), and design complexity (IVG). The creation of these tables will assist computations pertaining to the probability theorem in examining the performance and quality of the software defect detection metrics.
+
+```{r }
+
+swd=read.csv("swdefects.csv")
+head(swd)
+tabRawLoc=with(swd, table(predict.loc.50,defect))
+tabRawVG=with(swd, table(predict.vg.10,defect))
+tabRawEVG = with(swd, table(predict.evg.14.5,defect))
+tabRawIVG = with(swd, table(predict.ivg.9.2,defect))
+barplot(tabRawLoc, beside=TRUE, leg=TRUE, col = c('green','cyan'))
+tabLoc=addmargins(tabRawLoc)
+tabLoc
+barplot(tabRawVG, beside=TRUE, leg=TRUE, col = c('green','cyan'))
+tabVG = addmargins(tabRawVG)
+tabVG
+barplot(tabRawEVG, beside=TRUE, leg=TRUE, col = c('green','cyan'))
+tabEVG = addmargins(tabRawEVG)
+tabEVG
+barplot(tabRawIVG, beside=TRUE, leg=TRUE, col = c('green','cyan'))
+tabIVG = addmargins(tabRawIVG)
+tabIVG
+
+```
+
+
+# Probability Measures for Evaluating Defect Prediction Algorithms
+
+Using the predifined functions and the tables of different methods for defect evaluation, we can summarize the assessment of each method as a table. 
+
+```{r}
+
+# for LOC
+row1 = c(acc(400,29,49,20), detect(29,20), falarm(400,49), prec(49, 20))
+# for VG
+row2 = c(acc(397,35,52,14), detect(35,14), falarm(397,52), prec(52, 14))
+# for EVG
+row3 = c(acc(441,47,8,2), detect(47,2), falarm(441,8), prec(8, 2))
+# for IVG
+row4 = c(acc(422,38,27,11), detect(38,11), falarm(422,27), prec(27, 11))
+
+tab3 = matrix(1:16, nrow = 4, byrow = T)
+tab3[1,] = row1
+tab3[2,] = row2
+tab3[3,] = row3
+tab3[4,] = row4
+colnames(tab3) = c('Accuracy', 'Detection rate', 'False alarm rate', 'Precision')
+rownames(tab3) = c('Lines of code', 'Cyclomatic complexity', 'Essential complexity', 'Design complexity')
+tab3
+
+```
+
+We can create a function `mybar()`that will have as its input variables:
+
+>
+    1. tab (this will be a n by m table)
+    2. acc (accuracy of the decimal output)
+    
+
+And it will output two things:
+
+>
+    1. A barplot of the table
+    2. Commandline output in the form of a list containing the table
+
+```{r}
+
+mybar = function(tab, accu = 3){
+  # barplot of the table
+  tabUseFunc = round(tab,accu)
+  barplot(tabUseFunc, beside = T, col = c('red','blue','green','black'), legend = T)
+  
+  # return as a list
+  retList = list('table' = tabUseFunc)
+  return(retList)
+  
+  #table must be represented as matrix here
+}
+
+#test the function
+
+mybar(tab3, accu = 3)
+
+```
+
+# Discussion
+    
+The graph above illustrates the probabilities describing the quality and performance of each method to identify software defects. One of the most noticeable observation is the accuracy for all four methods. Overall, all four metrics to detect software defects possess about 85% accuracy, with essential complexity being the most accurate with 89% accuracy. Nonetheless, essential complexity has lowest detection rate. This can serve as an explanation why essential complexity has the highest accuracy rate: it does not detect a lot of code modules, and out of those detected, this metric happened to detect them correctly. Essential rate is also the metric with lowest false alarm rate. In terms of false alarm rate, all other metrics show less than 20%. Lines of code serves as the metric with highest precision and detection rate. In term of precision, both essential complexity and cyclomatic complexity yield 20% precision. The other two metrics are slightly more precise at 30%. Overall, amongst the four metrics, lines of code is arguably the best metric to spot software defect: high accuracy, high detection rate, not the highest false alarm rate, and good precision rate. 
+
+# Conclusion
+
+Four metrics from the SWEDEFECTS file were analyzed: lines of code, cyclomatic complexity, essential complexity, and design complexity. For each of these metrics, their accuracy, detection rate, false alarm rate, and precision were computed using probabilities theorem. All of them were anout 85% accurate. Essential complexity was the most accurate but it has lowest detection rate. Overall, lines of code is the best metric to evaluate software defects.

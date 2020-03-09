@@ -1,0 +1,14 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Wells: Presents geological variables from a well, labelled by depth
+
+```{r}
+
+data = read.csv('Wells.csv')
+head(data)
+
+```
+
