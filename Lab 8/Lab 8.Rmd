@@ -1,0 +1,291 @@
+---
+title: "Lab 8"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+```{r}
+
+getwd()
+
+```
+
+
+# Task 2
+
+**Sampling from uniform distribution between 0 and 5 with 10 samples**
+```{r}
+
+uni = runif(10,0,5)
+uni
+
+```
+
+Population mean
+```{r}
+
+0.5*(5+0)
+
+```
+
+Population variance
+```{r}
+
+(5-0)^2/12
+
+```
+
+Mean and Std Dev of the sample
+```{r}
+
+meanS = mean(uni)
+stdS = sd(uni)
+
+meanS
+stdS
+
+```
+
+The mean and the std dev of the samples are both smaller than the ones for population. They differ quite considerably. 
+
+**Samples sum and mean**
+
+Statistics for $\overline{y}$ 
+$$ \overline{y} \sim N(\mu, \frac{\sigma^2}{n})$$
+
+For a normal distribution,
+
+$$ \mu = \frac{a+b}{n} = \frac{0+5}{2} = 2.5$$
+$$ \sigma^2 = \frac{1}{n}\frac{(b-a)^2}{12} = \frac{1}{10}\frac{(5-0)^2}{12} = 0.2083 $$
+Hence, 
+
+$$ \overline{y} \sim N(2.5, 0.2083)$$
+
+Statistics for T
+
+$$ T \sim N(n\mu, n\sigma^2)$$
+$$ T \sim N(10*2.5, 10*2.083)$$
+$$ T \sim N(25, 20.83)$$
+
+**Simulating Central Limit Theorem from a Uniform Distribution**
+
+Distribution of sample sum
+```{r}
+
+myclt=function(n,iter){
+  y=runif(n*iter,0,5) # A
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE) #B
+  sm=apply(data,2,sum) #C
+  hist(sm, c =  '#0298A3')
+  sm
+}
+
+w = myclt(n=10,iter=10000) #D
+
+```
+
+Code explanation:
+
+>
+  A: Take n number of samples from a uniform distribution with x between 0 and 5 by iteration number of times.
+>  
+  B: Store the samples of each iteration, column represents iteration
+>
+  C: take the sum by column
+>
+  D: Execute the function with 10 samples and 10,000 iterations
+
+```{r}
+
+#mean of w 
+mean(w)
+
+#variance of w
+sd(w)^2
+
+```
+
+Distribution of sample mean
+
+```{r}
+
+myclt2=function(n,iter){
+  y=runif(n*iter,0,5) 
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE) 
+  smean=apply(data,2,mean) 
+  hist(smean, c = '#0298A3')
+  smean
+}
+
+w2 = myclt2(n=10,iter=10000)
+
+```
+
+```{r}
+
+#mean of w2
+mean(w2)
+#variance of w2
+sd(w2)^2
+
+```
+
+# Task 3
+```{r}
+
+mycltu=function(n,iter,a=0,b=10){
+  y=runif(n*iter,a,b)
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE)
+  w=apply(data,2,mean)
+  param=hist(w,plot=FALSE)
+  ymax=max(param$density)
+  ymax=1.1*ymax
+  hist(w,freq=FALSE,  ylim=c(0,ymax), main=paste("Histogram of sample mean",
+"\n", "sample size= ",n,sep=""),xlab="Sample mean")
+  lines(density(w),col="Blue",lwd=3)
+  curve(dnorm(x,mean=(a+b)/2,sd=(b-a)/(sqrt(12*n))),add=TRUE,col="Red",lty=2,lwd=3)
+  curve(dunif(x,a,b),add=TRUE,lwd=4, col = 'green')
+
+}
+mycltu(n=20,iter=100000)
+
+```
+
+**Explanation to Some of the Code Lines**
+
+```w=apply(data,2,mean)``` The apply function uses 2 as the second input because we want to get the mean of each column -that represents iteration- in the matrix *data*
+
+```mycltu(n=20,iter=100000)``` will give 2,000,000 terms: 20 samples for each iteration, totaling 100,000 iterations. 
+
+The part ```dnorm(x,mean=(a+b)/2,sd=(b-a)/(sqrt(12*n))), ...)``` is actually similar to creating normal distribution as previous labs. Nonetheless, here we are using the statistics of a uniform distribution. The mean is trivial. For the standard deviation however, we know the variance is expressed as $\frac{(b-a)^2}{12}$ and we know standard deviation is the square root of the variance. This is why the standard deviation in the function is expressed as such. 
+
+```{r}
+
+n.list = c(1,2,3,5,10,30)
+
+for (i in n.list){
+  
+  mycltu(n=i,iter=100000)
+  
+}
+
+```
+
+It is observed that one sample will simply give you a uniform distribution. Two samples will yield a somewhat triangular distribution. The distribution is becoming more Gaussian as the number of samples increases. 
+
+# Task 4
+```{r}
+
+mycltb=function(n,iter,p=0.5,...){
+  
+  y=rbinom(n*iter,size=n,prob=p)
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE)
+  w=apply(data,2,mean)
+  param=hist(w,plot=FALSE)
+  ymax=max(param$density)
+  ymax=1.1*ymax
+  hist(w,freq=FALSE,  ylim=c(0,ymax),
+  main=paste("Histogram of sample mean","\n", "sample size= ",n,sep=""),
+  xlab="Sample mean",...)
+  lines(density(w),col="Blue",lwd=3)
+  curve(dnorm(x,mean=n*p,sd=sqrt(p*(1-p))),add=TRUE,col="Red",lty=2,lwd=3) 
+
+}
+
+```
+**For p = 0.3**
+
+```{r}
+
+n4.list = c(1,2,3,5,10,30)
+
+for (i in n4.list){
+  mycltb(n=i,iter=10000,p=0.3)
+}
+
+```
+
+**for p = 0.7**
+```{r}
+
+for (i in n4.list){
+  mycltb(n=i,iter=10000,p=0.7)
+}
+
+```
+
+**For p = 0.5**
+
+```{r}
+
+for (i in n4.list){
+  mycltb(n=i,iter=10000,p=0.5)
+}
+
+```
+
+For all values of p, distribution becomes more Gaussian with increasing sample size. The mean is *np*.
+
+# Task 5
+```{r}
+
+mycltp=function(n,iter,lambda=10,...){
+  
+  y=rpois(n*iter,lambda=lambda)
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE)
+  w=apply(data,2,mean)
+  param=hist(w,plot=FALSE)
+  ymax=max(param$density)
+  ymax=1.1*ymax
+  layout(matrix(c(1,1,2,3),nr=2,nc=2, byrow=TRUE))
+  hist(w,freq=FALSE,  ylim=c(0,ymax), col=rainbow(max(w)),
+  main=paste("Histogram of sample mean","\n", "sample size= ",n," iter=",iter," lambda=",lambda,sep=""),
+xlab="Sample mean",...)
+  curve(dnorm(x,mean=lambda,sd=sqrt(lambda/n)),add=TRUE,col="Red",lty=2,lwd=3) # add a theoretical curve
+  barplot(table(y)/(n*iter),col=rainbow(max(y)), main="Barplot of sampled y", ylab ="Rel. Freq",xlab="y" )
+  x=0:max(y)
+  plot(x,dpois(x,lambda=lambda),type="h",lwd=5,col=rainbow(max(y)),
+  main="Probability function for Poisson", ylab="Probability",xlab="y")
+
+}
+
+```
+
+**For lambda = 4, iter = 10,000**
+```{r}
+
+n5.list = c(2,3,5,10,20)
+
+for (i in n5.list){
+  mycltp(n=i,iter=10000, lambda = 4)
+}
+
+```
+
+**For lambda = 10, iter = 10,000**
+```{r}
+
+for (i in n5.list){
+  mycltp(n=i,iter=10000, lambda = 10)
+}
+
+```
+
+# Task 6
+```{r}
+
+library(math4753)
+
+clt_pois(10, 1000, lambda = 5)
+
+```
+

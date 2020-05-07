@@ -1,0 +1,407 @@
+---
+title: "Assignment 4"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1, MS 7.118
+
+## a
+```{r}
+
+data1 = read.csv('NZBIRDS.csv')
+
+random = sample(1:116, 35, replace=F)
+
+data1Random = data1[random,]
+
+```
+
+## b
+```{r}
+
+massMean = mean(data1Random$Body.Mass)
+massSd = sd(data1Random$Body.Mass)
+
+massMean
+massSd
+
+# 95% CI for body mass mean
+t.test(data1Random$Body.Mass)
+
+```
+
+## c
+
+Practical interpretation of 95% CI performed in b translates to: we are 95% confident that the mean of the population lies between the interval stated above in **c**. 
+
+## d
+
+```{r}
+
+massMeanTrue = mean(data1$Body.Mass)
+massMeanTrue
+
+```
+
+Yes, the true mean is within the 95% CI. The interval is very likely to include the true mean because the sampling number is considered large and confidence interval is also large. This sampling configuration is likely to represent the population quite well. 
+
+## e
+```{r}
+
+meanEggL = mean(data1Random$Egg.Length)
+sdEggL = sd(data1Random$Egg.Length)
+
+meanEggL
+sdEggL
+
+# 95% CI for body egg legth
+t.test(data1Random$Egg.Length)
+
+mean(na.omit(data1$Egg.Length))
+
+```
+
+The practical interpretation is analogous to answer in c, but change the variable of interest from body mass to egg length. 
+
+Check confirms that true population mean is witin the 95% CI. 
+
+## f
+```{r}
+
+# Extinct
+pe = 21/38
+qe = 1-pe
+ne = 38
+
+# Not extinct
+pn = 7/78
+qn = 1 - pn
+nn = 78
+
+# mean prop
+meandiff5 = pe - pn
+
+# z stat
+zstat5 = qnorm(1 - (0.05/2), 0, 1)
+
+dis5 = zstat5*((pe*qe/ne)+(pn*qn/nn))^0.5
+
+low5 = meandiff5 - dis5
+up5 = meandiff5 + dis5
+
+low5
+up5
+
+```
+
+## g
+
+Yes, there is evidence based on positive CI in c. 
+
+# Question 2, MS 7.120
+
+## a
+```{r}
+
+zstat2 = qnorm(1 - 0.1/2, 0, 1)
+meandiff2 = 1312-1352
+devi2 = zstat2*((422^2/100) + (271^2/47))^0.5
+lower2 = meandiff2 - devi2
+upper2 = meandiff2 + devi2
+
+# lower 90% CI
+lower2
+
+# upper 90% CI
+upper2
+
+```
+
+## b
+```{r}
+
+fstat2l = qf(1 - 0.1/2, 100 -1, 47 -1)
+fstat2u = qf(1 - 0.1/2, 47 -1, 100 -1)
+
+lower2b = (422^2/271^2)*(1/fstat2l)
+upper2b = (422^2/271^2)*fstat2u
+
+lower2b
+upper2b
+
+```
+
+# Question 3, MS 7.128
+
+## a
+
+$$Z = \frac{y - \mu}{\sigma} = \frac{y - 0}{\sigma}$$
+$$Z = \frac{y}{\sigma}$$
+
+The equation above will have a normal distribution. However, if we square both side, 
+
+$$Z^2 = \frac{y^2}{\sigma^2}$$
+
+This equation will follow $\chi^2$ distribution. 
+
+## b 
+
+$$ P(\chi^2_{1-\alpha/2} \leq \frac{y^2}{\sigma^2} \leq \chi^2_{\alpha/2}) = 1 - \alpha$$
+$$ P(\frac{1}{\chi^2_{1-\alpha/2}} \geq \frac{\sigma^2}{y^2} \geq \frac{1}{\chi^2_{\alpha/2}}) = 1 - \alpha$$
+$$ P(\frac{y^2}{\chi^2_{\alpha/2}} \leq \sigma^2 \leq \frac{y^2}{\chi^2_{1-\alpha/2}}) = 1 - \alpha$$
+
+for 95% CI, $\alpha$ = 0.05
+
+```{r}
+
+lowchi = qchisq(1 - 0.05/2, 1)
+upchi = qchisq(0.05/2, 1)
+
+round(lowchi,4)
+round(upchi, 4)
+
+```
+
+Lower interval:
+$$\frac{y^2}{5.0239}$$
+
+Upper interval:
+$$\frac{y^2}{0.001}$$
+
+# Question 4, MS 8.24
+```{r}
+
+data8 = read.csv("ROUGHPIPE.csv")
+
+```
+
+## a
+$$ H_0 : \mu = 2 $$
+$$ H_1 : \mu \neq 2 $$
+
+## b 
+
+From the MINITAB, t-stat is -1.02 and p-value is 0.322
+
+## c
+
+Reject when y < 1.63580 and y > 2.12620
+
+## d
+
+Because p>$\alpha$ and the value of 2 is within the acceptance region (\alpha = 0.05), it is plausible that $\mu$ is 2. 
+
+## e
+
+The confidence interval is built with test statistics. 
+
+
+# Question 5, MS 8.28
+```{r}
+
+DOC = c(9.6,4.5,13.2,4.1,22.6,2.7,14.7,3.5,13.6,19.8,14.3,56.9,25.1,18.4,2.7,4.2,30.2,10.3,17.6,2.4,17.3,38.8,3.0,5.8,7.6)
+
+```
+
+## a
+```{r}
+
+t.test(DOC, mu=15, conf.level = 0.9)
+
+```
+
+The one sample t test shows p>$\alpha$ and the null value within 90% CI. Hence, it is plausible that the sample is representative of the population. 
+
+## b
+```{r}
+
+tstat5 = qt(1-0.1/2, 25-1)
+low5 = 15 - tstat5*(sd(DOC)/25^0.5)
+up5 = 15 + tstat5*(sd(DOC)/25^0.5)
+
+tLess14 = (low5 - 14)/(sd(DOC)/25^0.5)
+tMore14 = (up5 - 14)/(sd(DOC)/25^0.5)
+
+pt(tLess14, df = 25-1) + (1-pt(tMore14, df = 25-1))
+
+```
+
+# Question 6, MS 8.44
+```{r}
+
+data6 = read.csv('ORCHARD.csv')
+data6g = na.omit(data6)
+
+fog = data6g[data6g$CONDITION =='FOG', 'RATIO']
+
+cleClou = data6g[data6g$CONDITION =='CLEAR' | data6g$CONDITION =='CLOUD', 'RATIO']
+
+t.test(fog, cleClou, mu = 0, var.equal = T)
+
+```
+
+The problem above was configured such that $H_0: \mu_1 - \mu_2 = 0$. With p slightly greater than $\alpha$ and the null value is within the 95% CI, it is plausible that the population means to be similar. 
+
+# Question 7, MS 8.84
+```{r}
+
+data7 = read.csv('GASTURBINE.csv')
+
+```
+
+## a
+```{r}
+
+traditional = data7[data7$ENGINE =='Traditional', 'HEATRATE']
+aeroder = data7[data7$ENGINE == 'Aeroderiv', 'HEATRATE']
+
+var.test(aeroder, traditional)
+
+```
+
+The p value is smaller than $\alpha$ = 0.05 and the null value is not within the CI. Hence, it is not plausible that the ratio to be 1, which translates to the variances of the two vectors to be different. 
+
+Here, we compare the variance of traditional engine to aeroderivative engine. Ratio of variance is far from one. Inference of population means must be performed with Welch test. 
+
+## b 
+```{r}
+
+advanced = data7[data7$ENGINE == 'Advanced', 'HEATRATE']
+
+var.test(aeroder, advanced)
+
+```
+
+Same conclusion as in **a**
+
+# Question 8, MS 8.99
+```{r}
+
+ant = read.csv('GOBIANTS.csv')
+
+```
+
+## a
+
+$$ H_0: \frac{\sigma^2_{1}}{\sigma^2_{2}} = 1$$
+$$ H_0: \frac{\sigma^2_{1}}{\sigma^2_{2}} \neq 1$$
+
+## b
+
+```{r}
+
+dry = ant[ant$Region == 'Dry Steppe ', 'AntSpecies']
+gobi = ant[ant$Region == 'Gobi Desert', 'AntSpecies']
+
+t.test(dry, gobi, var.equal = T)
+
+var.test(dry, gobi)
+
+```
+
+t is 0.1821
+
+## c
+```{r}
+
+round(qf(c(0.05,1 - 0.05/2), length(dry) - 1, length(gobi) -1), 4)
+
+```
+rejection region is when F<0.1598 and F>7.3879
+
+## d
+
+From t.test in **b**, p-value = 0.8595
+
+## e
+
+From `var.test()` in **b**, because p-value > $\alpha$ and the null value of 1 is within the 95% CI, we conclude that it is plausible for the population variance to be similar. 
+
+## d
+
+This holds truth for independent samples. 
+
+# Question 9, MS 8.104
+
+```{r}
+
+data9 = read.csv('THRUPUT.csv')
+
+var.test(data9$HUMAN, data9$AUTO)
+
+```
+
+From the `var.test()`, we can conclude that it is plausible for the variances to be the same for this paired samples. We can set the hypothesis:
+
+$$ H_0: \mu_{human} - \mu_{auto} = 0$$
+
+$$ H_0: \mu_{human} - \mu_{auto} \neq 0$$
+
+```{r}
+
+t.test(data9$HUMAN, data9$AUTO, paired = T, var.equal = T, mu = 0)
+
+```
+
+From `t.test()`, we observe p-value < $\alpha$, which is 0.05 in this case. We further notice the fact that the null value is not within the 95% CI. Therefore, we conclude that the NULL hypothesis is not plausible, that is the population means for each scheduling method are different. 
+
+# Question 10
+
+```{r}
+
+myboot<-function(iter=10000,x,fun="mean",alpha=0.05, D0 = 0,...){ 
+n=length(x)
+
+y=sample(x,n*iter,replace=TRUE)
+rs.mat=matrix(y,nr=n,nc=iter,byrow=TRUE)
+xstat=apply(rs.mat,2,fun) 
+ci=quantile(xstat,c(alpha/2,1-alpha/2))
+# A histogram follows
+# The object para will contain the parameters used to make the histogram
+para=hist(xstat,freq=FALSE,las=1,
+main=paste("Histogram of Bootstrap sample statistics","\n","alpha=",alpha," iter=",iter,sep=""),
+...)
+
+#mat will be a matrix that contains the data, this is done so that I can use apply()
+mat=matrix(x,nr=length(x),nc=1,byrow=TRUE)
+
+#pte is the point estimate
+#This uses whatever fun is
+pte=apply(mat,2,fun)
+abline(v=pte,lwd=3,col="Black")# Vertical line
+segments(ci[1],0,ci[2],0,lwd=4)      #Make the segment for the ci
+text(ci[1],0,paste("(",round(ci[1],2),sep=""),col="Red",cex=3)
+text(ci[2],0,paste(round(ci[2],2),")",sep=""),col="Red",cex=3)
+
+obj = t.test(sam, mu = D0)
+lower = round(obj$conf.int[1],2)
+upper = round(obj$conf.int[2],2)
+text(lower,0.2,paste("(",lower,sep=""),col="Blue",cex=3)
+text(upper,0.2,paste(upper,")",sep=""),col="Blue",cex=3)
+
+# plot the point estimate 1/2 way up the density
+text(pte,max(para$density)/2,round(pte,2),cex=3)
+
+return(list(ci=ci,fun=fun,x=x, t=obj$statistic, cit=obj$conf.int))# Some output to use if necessary
+}
+
+```
+
+```{r}
+
+set.seed(35)
+sam<-round(rnorm(30,mean=20,sd=3),3)
+myboot(10000,x=sam,alpha=0.05,xlab="mean(x)",col="green", D0 = 20)
+
+```
+
+

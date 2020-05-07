@@ -1,0 +1,656 @@
+---
+title: "Assigment 3"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+
+# Question 1, MS 5.54
+```{r}
+
+data1 = read.csv("PHISHING.csv")
+head(data1)
+time1 = data1[,1]
+
+```
+
+## a
+```{r}
+
+#2 mins = 120 secs
+1 - pgamma(120, shape = 1, scale = 95)
+
+```
+
+## b 
+```{r}
+
+# Sample mean 
+mean(time1)
+
+# Sample variance
+var = sd(time1)^2
+var
+
+```
+
+```{r}
+
+# Exponential distribution
+mean1 = 95
+var1 = 95^2
+
+## mean
+mean1
+
+## variance
+var1
+
+```
+
+The means are extremely close, while the variances are arguably within close proximity. Overall, exponential distribution is sufficient in describing the phishing dataset. 
+
+# Question 2, MS 5.56
+```{r}
+
+alpha = 3
+beta = 0.07
+
+```
+
+## a
+```{r}
+
+# the mean
+alpha * beta
+
+# the variance
+alpha * beta^2
+
+```
+
+## b 
+```{r}
+
+lower2 = 0.21 - (3*0.0147)
+upper2 = 0.21 + (3*0.0147)
+
+lower2
+upper2
+
+```
+
+The maximum value observed 0.6 million cf/s is not within 3 std dev generated from the gamma distribution with $\alpha$ = 3 and $\beta$ = 0.07. Therefore, one or both of these parameters is/are wrong in describing the 4-year max flood level. 
+
+# Question 3, MS 5.60
+
+## a
+
+Mean for formula A
+```{r}
+
+2*2
+
+```
+
+Mean for formula B
+```{r}
+
+1*4
+
+```
+
+## b 
+
+variance for formula A
+```{r}
+
+2 * 2^2
+
+```
+
+variance for formula B
+```{r}
+
+1 * 4^2
+
+```
+
+## c
+```{r}
+
+# greater prob of generating reaction less than a min
+
+forA = pgamma(1, shape = 2, scale = 2)
+forB = pgamma(1, shape = 1, scale = 4)
+
+forA
+forB
+
+```
+
+Formula B has a greater probability of generating a human reaction in less than a minute. 
+
+# Question 4, MS 5.74
+```{r}
+reparwbl = function(a,b){ # a,b from text
+  list(ar=a,br=b^(1/a)) # ar, br for R
+}
+```
+
+## a
+```{r}
+
+alpha4 = 2
+beta4 = 4
+
+reparwbl(alpha4,beta4)
+
+ar = 2
+br = 2
+
+pweibull(2, 2, 2)
+
+```
+
+## b
+```{r}
+
+# mean
+beta4^(1/alpha4) * gamma((alpha4 + 1)/ alpha4)
+
+# standard dev
+var4 = beta4^(2/alpha4)* (gamma((alpha4 + 2)/ alpha4) - (gamma((alpha4 + 1)/ alpha4)^2))
+
+var4^0.5
+
+```
+
+## c
+```{r}
+
+lower4 = 1.7725 - (2*0.9265)
+upper4 = 1.7725 + (2*0.9265)
+
+lower4
+upper4
+
+pweibull(upper4, ar, br) - pweibull(lower4, ar, br)
+
+```
+
+## d
+```{r}
+
+1 - pweibull(6, ar, ar)
+
+```
+
+The probability in which Y>6 is really small: unlikely to exceed 6 years. 
+
+# Question 5, MS 5.84
+```{r}
+
+# beta
+alpha5 = 2
+beta5 = 9
+```
+
+## a
+```{r}
+# mean
+round(alpha5/(alpha5 + beta5), 4)
+
+# variance
+round((alpha5*beta5)/((alpha5 + beta5)^2 * (alpha5 + beta5 + 1)), 4)
+
+```
+
+## b 
+```{r}
+
+round(1 - pbeta(0.4, alpha5, beta5),4)
+
+```
+
+## c
+```{r}
+
+round(pbeta(0.1, alpha5, beta5), 4)
+
+```
+
+
+# Question 6, MS 5.114
+
+## a
+
+For Weibull distribution in a non-zero domain, 
+$$ f(y)= \frac{\alpha}{\beta}y^{\alpha - 1}e^{-y^{\alpha}/\beta} $$
+
+Matching the above equation with 
+$$f(y) = \frac{1}{8}ye^{-y^{2}/16} $$
+
+We can deduce that $\alpha$ = 2 and $\beta$ = 16
+
+## b 
+```{r}
+
+alpha6 = 2
+beta6 = 16
+
+# mean
+round(beta6^(1/alpha6) * gamma((alpha6 + 1)/alpha6),4)
+
+# variance
+round(beta6^(2/alpha6)* (gamma((alpha6 + 2)/ alpha6) - (gamma((alpha6 + 1)/ alpha6)^2)), 4)
+
+```
+
+## c
+```{r}
+
+reparwbl(alpha6, beta6)
+
+ar6 = 2
+br6 = 4
+
+round(1 - pweibull(6, ar6, br6),4)
+
+```
+
+# Question 7, MS 6.2
+
+## a
+
+$$ \sum_{y}\sum_{x}p(x,y)=1$$
+
+```{r}
+library(MASS)
+
+# two dice have 36 outcomes with equal likelyhood.
+
+# joint probability distribution p(x,y) can be represented as table
+
+joint = matrix(1:36, nrow = 6, byrow = T)
+joint[,] = 1/36
+
+colnames(joint) = c(1,2,3,4,5,6)
+rownames(joint) = c(1,2,3,4,5,6)
+
+fractions(joint)
+
+```
+
+## b 
+
+$$P_{1}(x)=\sum_{y}p(x,y) $$
+```{r}
+
+#for p1(x)
+
+fractions(sum(joint[1,]))
+
+# for p2(y)
+
+fractions(sum(joint[,1]))
+
+```
+
+## c
+$$p_{1}(x|y) = \frac{p(x,y)}{p_2(y)} $$
+```{r}
+
+# from part a we know for any x and y, p(x,y) = 1/36
+
+#for p1(x | y)
+fractions((1/36)/(1/6))
+
+# for p2(y | x)
+fractions((1/36)/(1/6))
+
+```
+
+## d
+
+From part **b** and **c**, since 
+$$ p_{1}(x|y) = p_{1}(x)$$ 
+(this is also true for $p_2$), the two dice events are independent. 
+
+# Quetion 8, MS 6.4
+
+## a
+
+Given **X** representing the energy level and **Y** representing the time period,
+
+```{r}
+
+joint8 = matrix(1:9, nrow = 3, byrow = T)
+colnames(joint8) = c(1,2,3)
+rownames(joint8) = c(1,2,3)
+# if we do by row, how many x_i correspond do y_i?
+joint8[1,] = c(1/7, 2/7, 1/7)
+joint8[2,] = c(0, 0, 2/7)
+joint8[3,] = c(0, 0, 1/7)
+
+# X is the column, Y is the row
+fractions(joint8)
+
+```
+
+## b 
+$$P_{1}(x)=\sum_{y}p(x,y) $$
+
+```{r}
+
+p1x8 = apply(joint8, 2, sum)
+fractions(p1x8)
+
+```
+
+## c
+$$P_{2}(y)=\sum_{x}p(x,y) $$
+
+```{r}
+
+p2y8 = apply(joint8, 1, sum)
+fractions(p2y8)
+
+```
+
+## d
+$$p_{2}(y|x) = \frac{p(x,y)}{p_1(x)} $$
+```{r}
+
+# for x = 1
+joint8[,1]/p1x8[1]
+
+# for x = 2
+joint8[,2]/p1x8[2]
+
+# for x = 3
+joint8[,3]/p1x8[3]
+
+```
+
+# Question 9, MS 6.12
+
+## a
+
+$$ f(x,y) = \frac{e^{-y/10}}{10y}, 0<y<x<2y $$
+$$f(y)=\int_{-\infty}^{\infty}\frac{e^{-y/10}}{10y}dx$$
+In non-zero domain, $$f(y)=\int_{y}^{2y}\frac{e^{-y/10}}{10y}dx$$
+$$ f(y) =  \frac{e^{-y/10}}{10y}x\Big|_y^{2y}$$
+$$ f(y) =  \frac{e^{-y/10}}{10}$$
+This is an exponential distribution
+
+## b
+
+E(Y) = $\mu$ = 10 for exponential distribution.
+
+# Question 10, MS 6.14
+
+## a
+
+$$ \int_{-\infty}^{\infty}\int_{-\infty}^{\infty}f(x,y)dydx=1 $$
+$$ \int_{0}^{\infty}\int_{0}^{x}ce^{-x^2}dydx=1 $$
+$$ c\int_{0}^{\infty}e^{-x^2}y\Big|_0^{x}dx=1 $$
+$$ c\int_{0}^{\infty}xe^{-x^2}dx=1 $$
+$$ c\lim_{d\rightarrow\infty} -\frac{e^{-x^2}}{2}\Big|_0^{d}=1 $$
+$$c\lim_{d\rightarrow\infty}(\frac{-e^{-d^2}}{2} - \frac{-e^{-0^2}}{2})=1$$
+$$c(0-(-\frac{1}{2}))=1$$
+$$ c = 2$$
+
+## b
+
+Finding the marginal density for X
+$$ f(x) = \int_{-\infty}^{\infty}2e^{-x^2}dy$$
+$$ f(x) = \int_{0}^{x}2e^{-x^2}dy$$
+$$ f(x) = 2e^{-x^2}y\Big|_0^{x}$$
+$$ f(x) = 2xe^{-x^2} $$
+
+Showing that the integral over the entire x is equal to 1. But, the domain in which $f(x)$ is non-zero is only between 0 and $\infty$
+
+```{r}
+
+fun10 <- function(x){
+  2*x*exp(-(x^2))
+}
+
+integrate(fun10, 0, Inf)
+
+```
+
+## c
+$$f_2(y|x)=\frac{f(x|y)}{f(x)}$$
+$$f_2(y|x)=\frac{2e^{-x^2}}{2xe^{-x^2}}$$
+$$f_2(y|x)=\frac{1}{x}$$
+
+# Question 11, MS 6.51
+```{r}
+
+joint11 = matrix(1:9, nr = 3, byrow = T)
+colnames(joint11) = c(-1, 0, 1)
+rownames(joint11) = c(-1, 0, 1)
+joint11[1,] = c(1/12, 2/12, 1/12)
+joint11[2,] = c(2/12, 0, 2/12)
+joint11[3,] = c(1/12, 2/12, 1/12)
+fractions(joint11)
+
+```
+
+
+
+in relation to E(X), the p(x) are
+```{r}
+
+fractions(apply(joint11, 2, sum))
+
+```
+Equal chance, E(X) = 0
+
+in relation to E(Y), the p(y) are
+```{r}
+
+fractions(apply(joint11, 1, sum))
+
+```
+Equal chance, E(Y) = 0
+
+To find covariance, 
+$$cov(x,y)=E(XY)-E(X)E(Y)$$
+$$cov(x,y)=\sum_{x}\sum_{y}xyp(x,y)-0$$
+To find that double sum,
+```{r}
+
+sum(-1*joint11[1,] + 0*joint11[2,] + 1*joint11[3,])
+
+```
+
+$$cov(x,y)=0$$
+
+For independence, the following must be true for all x and y
+$$ p(x,y) = p(x)p(y) $$
+suppose we take x = -1 and y = 1, 
+$$p(-1,1)=p(-1)p(1) $$
+For the left hand side, we can find from the table
+$$ \frac{1}{12} = \frac{1}{3}*\frac{1}{3} $$
+$$\frac{1}{12} \neq \frac{1}{9} $$
+
+Overall, covariance being zero does not translate to independence. 
+
+# Question 12, MS 6.74
+
+## a
+Y ~ Unif(1,3)
+We know by Central Limit Theorem (CLT) that given the size of the sample is big, $E(\overline{Y})$ = $\mu$ 
+```{r}
+
+#E(Y)
+(1+3)/2
+
+```
+
+## b 
+Again, CLT states that $Var(\overline{Y}) =\frac{\sigma^2}{n}$
+```{r}
+
+var12 = ((3-1)^2/12)/60
+var12
+
+sd12 = var12^0.5
+```
+
+## c
+CLT suggests that the means are distributed normal as:
+$$ \overline{Y} \sim N(\mu=2, \sigma^2=0.0056) $$
+
+## d
+```{r}
+
+# meanY between 1.5 and 2.5
+pnorm(2.5, 2, sd12) - pnorm(1.5, 2, sd12)
+
+```
+
+## e
+```{r}
+
+# meanY exceeds 2.2
+round(1 - pnorm(2.2, 2, sd12),4)
+
+```
+
+# Question 13, MS 6.90
+
+## a
+By CLT, 
+$$ \overline{x} \sim N(\mu=p, \sigma^2=\frac{p(1-p)}{n})$$
+```{r}
+
+p = 0.4*20 #chance of swordfish to have beyond-treshold mercury level
+
+var13 = 8*(20-8)/20
+var13
+
+sd13 = var13^0.5
+sd13
+
+```
+$$ \overline{x} \sim N(0.4, 0.012)$$
+
+```{r}
+
+# normal approx to binomial, prob of <2 has beyond-treshold mercury
+pnorm(1.5, p, sd13)
+
+```
+
+## b 
+```{r}
+
+# more than 1/2 of 20 samples have high mercury level/
+# half of 20 is 10, so we use 10.5 as normal bound
+
+1 - pnorm(10.5, p, sd13)
+
+```
+
+## c
+```{r}
+
+# calculating part a using the actual binomial distribution
+dbinom(1,20,0.4) + dbinom(0,20,0.4)
+
+# calculating part b using the actual binomial distribution
+list13 = c(0,1,2,3,4,5,6,7,8,9,10)
+
+tempo13 = 0
+
+for (i in list13){
+  tempo13 = tempo13 + dbinom(i, 20, 0.4)
+}
+
+1- tempo13
+
+```
+
+# Question 14, MS 7.108
+
+```{r}
+
+data14 = read.csv("LEADCOPP.csv")
+head(data14)
+lead = data14[,1]
+copper = data14[,2]
+
+```
+
+## a
+```{r}
+
+t.test(lead, conf.level = 0.99)
+
+```
+
+## b
+```{r}
+
+t.test(copper, conf.level = 0.99)
+
+```
+
+## c
+
+**for part a**, the output of the confidence interval is not physical. We cannot have negative contamination level. Therefore, we can say that 99% of the mean lead contamination data are entrapped within 0 and 6.9191 $\mu g/L$. This is quite a wide range, but again, the confidence interval is also big. 
+
+**for part b**, we can say that 99% of the mean copper contamination data are entrapped within 0.1519 and 0.6647 mg/L. This is quite a wide range, but again, the confidence interval is also big. 
+
+## d
+
+99% confidence interval can be interpreted quite literally that we are sure, by 99%, the mean of the data series of interest lies within this interval. Quantitatively, 99% of the data lies within this interval.
+
+# Question 15, MS 7.114
+
+```{r}
+
+data15 = read.csv("SOLARAD.csv")
+stjos = data15[,2]
+iowa = data15[,3]
+
+diff15 = stjos - iowa
+
+t.test(diff15, conf.level = 0.95)
+
+```
+
+The mean difference lies with 95% confidence between 156.8193 and 239.1807 BTU/sq. ft. 
+
+# Question 16, MS 7.116
+
+```{r}
+
+data16 = read.csv("DIAZINON.csv")
+
+day = data16[,2]
+night = data16[,3]
+
+t.test(day, conf.level = 0.9)
+t.test(night, conf.level = 0.9)
+
+diff16 = day - night
+t.test(diff16, conf.level = 0.9)
+
+```
+
+## b 
+
+some assumptions for the validity: both populations are independent, are normal, and have equal variances 
+
+## c
+
+Yes, considering the negative upper and lower bounds of the interval from part **a**, the mean diazinon residue level differs from day to night. 

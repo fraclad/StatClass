@@ -1,0 +1,278 @@
+---
+title: "Lab 11"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+    in_header: 'header.html'
+    css: 'index.css'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+```{r}
+
+getwd()
+
+```
+
+# Task 2, Calculating CI
+
+A ram press makes washers for agricultural machinery. The mean diameter (cm) of the washers is of interest. We can manually construct various CI level for the mean using pivotal statistics *t*. 
+
+```{r}
+
+d=c(5.0581, 4.9707, 5.0893, 4.9334, 4.9777, 5.0285, 4.8555, 4.9565, 4.9769, 4.9722, 4.999, 4.9925, 4.9686, 5.0662, 4.9239, 4.9781, 5.0485, 5.0014, 4.9957, 5.0195, 5.0118, 4.9928, 5.0361, 5.0185, 4.9879)
+
+alpha = c(0.05, 0.1, 0.2, 0.5)
+
+for (i in alpha){
+  tstat = qt(1 - (i/2), length(d) - 1)
+  interval = tstat*sd(d)/(length(d))^0.5
+  print(paste0('for confidence = ', 1-i, ' the CI is between ', round(mean(d)-interval,4), ' and ', round(mean(d)+interval,4)))
+}
+
+```
+
+We can check the quality of this manual approach. Lets compute 80% CI using `t.test()` and see the bounds given in the output. 
+
+```{r}
+
+obj2 = t.test(d, conf.level = 0.8)
+
+obj2$conf
+
+```
+
+The answers from both approaches are the same. 
+
+We can also build CI for $\sigma^2$ using $\chi^2$
+
+```{r}
+
+n = length(d)
+
+for (i in alpha){
+  low = round((n-1)*var(d)/qchisq(1 - i/2, n-1), 4)
+  up = round((n-1)*var(d)/qchisq(i/2, n-1), 4)
+  print(paste0('variance with CI = ', 1-i, ' is between ', low, ' and ', up))
+}
+
+```
+
+# Task 3, Difference Between Two Means
+
+We have two vectors representing the lengths of two different fish. We will attempt to use **R** to compute different CIs for the mean difference. 
+
+First, the 95% CI for $\mu_{snapper}-\mu_{blue}$ will be computed manually. We will use the pooled variance approach since the length of the vectors are < 30. 
+```{r}
+
+blue=c(21.65, 17.48, 20.1, 21.57, 14.82, 19.17, 21.08, 18.23, 22.93, 15.66, 20.89, 21.66, 18.5, 20.59, 18.63, 18.91, 19.53, 17.7, 16.5, 19.03)
+
+nb = length(blue)
+
+snapper=c(31.65, 27.48, 30.1, 31.57, 24.82, 29.17, 31.08, 28.23, 32.93, 25.66, 30.89, 31.66, 28.5, 30.59, 28.63)
+
+ns = length(snapper)
+
+# pooled variance
+pvar = (((ns - 1)*var(snapper)) + ((nb - 1)*var(blue)))/(ns+nb-2)
+
+# t statistics
+tstat3 = qt(1 - (0.05/2), ns+nb-2)
+
+# distance from the mean 
+dis = tstat3*(pvar*((1/ns)+(1/nb)))*0.5
+
+# sample diff
+mudiff = mean(snapper) - mean(blue)
+
+# interval
+print(paste0(mudiff - dis, ' ', mudiff + dis))
+
+```
+
+From repetitions of sampling, 95% of the mean difference is negative, suggesting that the means are indeed, different. 
+
+We can also use `t.test()` to calculate the mean difference, assuming the variances of the two samples are the same. 
+
+```{r}
+
+ci3 = c(0.95, 0.85, 0.75, 0.25)
+
+for (i in ci3){
+  obj3 = t.test(snapper,blue,var.equal=TRUE, conf.level = i)
+  print(obj3$conf.int)
+}
+
+```
+
+As the confident level decreases, the confident interval shrinks, enclosing the point estimate tighter. 
+
+# Task 4, Two Paired, Dependent Samples
+
+Here, we calculate the mean difference for a paired samples, Exam 1 and Exam 2. First, we will compute the mean difference manually for a confidence level of 95%. 
+
+```{r}
+
+exam1=c(40.98, 59.36, 46.69, 41.8, 61.63, 65.31, 62.96, 60.21, 56.89, 78.41, 53.44, 75.2, 60.54, 52.43, 41.41, 70.79, 73.55, 55.65, 61.43, 63.84, 58.07, 53.79, 54.45, 67.18, 44.46)
+
+exam2=c(50.22, 66.19, 58.75, 51.88, 66.61, 70.86, 74.25, 70.23, 69.55, 87.18, 63.62, 81.7, 70.5, 66.02, 51.35, 80.92, 85.65, 65.44, 74.37, 75.28, 67.86, 59.92, 64.42, 73.57, 57.15)
+
+diff = exam1 - exam2
+meandiff = mean(diff)
+sddiff = sd(diff)
+n4 = length(exam1) # this will be the same as length(exam 2) bcs of paired samples
+zstat = qnorm(1 - (0.05/2), 0, 1)
+
+interval4 = zstat*sddiff/n4^0.5
+
+low4 = round(meandiff - interval4, 4)
+up4 = round(meandiff + interval4, 4)
+
+print(paste0('Mean diff for the paired sample with 95% conf level is ', low4, ' ', up4))
+
+```
+
+This means, 95% of repeating samples will lie within such interval, which is both lower and upper bounds < 0. Hence, we can say we are 95% confident that the means are different. 
+
+
+Now we can use `t.test()` for various confidence levels.
+```{r}
+
+ci4 = c(0.9, 0.8, 0.7, 0.6, 0.1)
+
+for (i in 1:5){
+  obj4 = t.test(exam1,exam2, paired =T, conf.level = ci4[i])
+  print(obj4$conf.int)
+}
+
+```
+
+# Task 5, CI for a Population Proportion
+
+We are given a data:
+
+```{r}
+
+data5 = read.csv('NZBIRDS.csv')
+with(data5, table(Extinct,Flight))
+
+```
+
+find a 95% CI for the difference in proportion of flightless birds for extinct and non-extinct species.
+
+```{r}
+
+# Extinct
+pe = 21/38
+qe = 1-pe
+ne = 38
+
+# Not extinct
+pn = 7/78
+qn = 1 - pn
+nn = 78
+
+pe*ne
+qe*ne
+pn*nn
+qn*nn
+```
+
+All of the results above, $p_in_i$ and $q_in_i$ are greater than 4. Hence, normal approximation is ok!
+
+```{r}
+# mean prop
+meandiff5 = pe - pn
+
+# z stat
+zstat5 = qnorm(1 - (0.05/2), 0, 1)
+
+dis5 = zstat5*((pe*qe/ne)+(pn*qn/nn))^0.5
+
+low5 = meandiff5 - dis5
+up5 = meandiff5 + dis5
+
+low5
+up5
+
+
+```
+
+# Task 6, Variance Ratio
+
+First, we will evaluate the CI for the variance ratio between two random samples as seeded below using F statistics and 95% confidence level. 
+
+```{r}
+
+set.seed(35)
+sam1=rnorm(25,mean=10,sd=5)
+set.seed(45)
+sam2=rnorm(34,mean=40,sd=8)
+
+ratio = var(sam1)/var(sam2)
+
+df1 = length(sam1) - 1
+df2 = length(sam2) - 1
+
+fstat = qf(1 - (0.05/2), df1, df2)
+
+low6 = ratio*(1/fstat)
+up6 = ratio*fstat
+
+ratio
+low6
+up6
+
+```
+
+Now, we can evaluate the ratio of variance using `var.test()` with various confidence levels
+
+```{r}
+
+ci6 = c(0.8, 0.7, 0.6, 0.5)
+
+for (i in ci6){
+  obj6 = var.test(sam1, sam2, conf.level = i)
+  print(obj6$conf.int)
+}
+
+```
+
+# Task 7, Building a 95%-CI Function 
+
+This section will build a function that calculates a 95% CI from a single vector x as the input. We will also add this function to my package. 
+
+```
+
+myci = function(x){
+  n = length(x)
+  tstat = qt(1 - (0.05/2), n-1)
+  interval = tstat*sd(x)/(n)^0.5
+  low = mean(x) - interval
+  up = mean(x) + interval
+  output = list('point est' = mean(x), 'low int' = low, 'up int' = up)
+  return(output)
+}
+
+```
+
+Now we can test the function from the package!
+
+```{r}
+
+library(math4753)
+
+set.seed(23)
+x = rnorm(30,mean=10,sd=12)
+
+myci(x)
+
+```
+

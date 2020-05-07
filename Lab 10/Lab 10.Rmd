@@ -1,0 +1,345 @@
+---
+title: "Lab 10"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+# Task 1, Working Directory
+```{r}
+
+getwd()
+
+```
+
+
+# Task 2, Binomial 
+
+Here we define a function to approximate the maximum likelihood from a sample by using a grid approximation. 
+
+```{r}
+
+mymaxlik=function(lfun,x,param,...){
+
+  np=length(param)
+  z=outer(x,param,lfun) # A
+  y=apply(z,2,sum)
+  plot(param,y,col="Blue",type="l",lwd=2,...)
+  i=max(which(y==max(y))) # B
+  abline(v=param[i],lwd=2,col="Red")
+  points(param[i],y[i],pch=19,cex=1.5,col="Black")
+  axis(3,param[i],round(param[i],2))
+  ifelse(i-3>=1 & i+2<=np, slope<-(y[(i-2):(i+2)]-y[(i-3):(i+1)])/(param[(i-2):(i+2)]-param[(i-3):(i+1)]),slope<-"NA")
+  
+  return(list(i=i,parami=param[i],yi=y[i],slope=slope))
+
+}
+
+
+```
+
+To examine what *line A* does, we can execute the function below
+
+```{r}
+
+outer(1:4,5:10,function(x,y) paste(x,y,sep=" "))
+
+```
+
+The `outer()` function takes the first parameter as a row element and the second parameter as column element to create a matrix. The values of each element in the matrix are computed using the given function. 
+
+Meanwhile, *Line B* find the largest index that corresponds to the greatest value found in vector *y*
+
+We can test the above function for a 8-experiment binomial with 20 trials with equal p. By imposing independence for each experiment, this can be written mathematically
+
+$$p(y) = \binom{20}{y_1}p^{y_1}q^{20-y_1}\ \binom{20}{y_2}p^{y_2}q^{20-y_2} \ ... \ \binom{20}{y_8}p^{y_8}q^{20-y_1} $$
+$$p(y) = \prod_{i = 1}^{8}\binom{20}{y_i}p^{y_i}q^{20 - y_i} $$
+
+This expression can be done in R as follows:
+
+```{r, eval=FALSE}
+
+y.list = c(y1,y2,y3,y4,y5,y6,y7,y8)
+
+a = 1
+
+for (i in y.list){
+  p = dbinom(i, 20, p) * a
+  a = p
+}
+
+print(a)
+
+```
+Now, we can use the `mymaxlink()` to find the maximum likelihood estimate given a list of ys as shown below. 
+
+```{r}
+
+logbin=function(x,param) log(dbinom(x,prob=param,size=20))
+
+x.list = c(3,3,4,3,4,5,5,4)
+
+mymaxlik(x=x.list,param=seq(0,1,length=1000),lfun=logbin,xlab=expression(pi),main="Binomial",cex.main=2)
+
+```
+
+# Task 3, Poisson
+
+In this section we will use `mymaxlik()` and `myNRML()` to estimate $\lambda$ for a poisson distribution with ys given in the chunk below (denoted by x.list3)
+
+```{r}
+
+x.list3 = c(4,6,7,6,5)
+
+logpoiss=function(x,param) log(dpois(x,lambda=param))
+
+mymaxlik(x=x.list3, param=seq(0,20,length=1000),lfun=logpoiss,xlab=expression(lambda),main="Poisson",cex.main=2)
+
+```
+
+The algebraic expression for the log likelihood is
+
+$$p(y) = \frac{\lambda^{y_1}e^{-\lambda}}{y_1!} \ \frac{\lambda^{y_2}e^{-\lambda}}{y_2!} \ ... \ \frac{\lambda^{y_n}e^{-\lambda}}{y_n!} $$
+$$p(y) = \frac{\lambda^{\sum_{i=1}^{n}y_i} \ e^{-n\lambda}}{\prod_{i=1}^{n}y_i!}$$
+$$ ln(p(y)) = ln(\lambda) \sum_{i=1}^{n}(y_i) - n\lambda - \sum_{i=1}^{n}(y_i!)$$
+
+In addition to using the grid approximation, we can also use Newton Raphson numerical method. 
+
+```{r}
+
+myNRML=function(x0,delta=0.001,llik,xrange,parameter="param"){
+  
+  f=function(x) (llik(x+delta)-llik(x))/delta
+  fdash=function(x) (f(x+delta)-f(x))/delta
+  d=1000
+  i=0
+  x=c()
+  y=c()
+  x[1]=x0
+  y[1]=f(x[1])
+  while(d > delta & i<100){
+    i=i+1
+    x[i+1]=x[i]-f(x[i])/fdash(x[i])
+    y[i+1]=f(x[i+1])
+    d=abs(y[i+1])
+  }
+  layout(matrix(1:2,nr=1,nc=2,byrow=TRUE),width=c(1,2))
+  curve(llik(x), xlim=xrange,xlab=parameter,ylab="log Lik",main="Log Lik")
+  curve(f(x),xlim=xrange,xaxt="n", xlab=parameter,ylab="derivative",main=  "Newton-Raphson Algorithm \n on the derivative")
+  points(x,y,col="Red",pch=19,cex=1.5)
+  axis(1,x,round(x,2),las=2)
+  abline(h=0,col="Red")
+  
+  segments(x[1:(i-1)],y[1:(i-1)],x[2:i],rep(0,i-1),col="Blue",lwd=2)
+  segments(x[2:i],rep(0,i-1),x[2:i],y[2:i],lwd=0.5,col="Green")
+  
+  list(x=x,y=y)
+}
+
+```
+
+Now we can use the previous input to approximate lambda using `myNRML()`
+
+```{r}
+
+myNRML(x0=1,delta=0.000001,llik=function(x) log(dpois(4,x)*dpois(6,x)*dpois(7,x)*dpois(6,x)*dpois(5,x)),xrange=c(0,20),parameter="lambda" )
+
+```
+
+From Newton-Raphson method, we approximiate $\lambda$ to be 5.59, while the grid method suggests $\lambda$ to be 5.61. These two values are remarkably close! 
+
+# Task 4, Biased Coin
+
+In this case, we have two binomial experiments. The first experiment has 6 trials with 2 heads, while the other one has 10 trials with 4 heads. Denoting p = chance of head, we can use `mymaxlikg()` to approximate for p. 
+
+Joint density has one unknown common parameter but different values for the other parameters
+
+```{r}
+
+logbin2=function(theta){log(dbinom(2,prob=theta,size=6)) + log(dbinom(4,prob=theta,size=10))}
+
+mymaxlikg=function(lfun="logbin2",theta) { # default log lik is a combination bin
+nth=length(theta)  # nu. of valuse used in theta
+thmat=matrix(theta,nr=nth,nc=1,byrow=TRUE) # Matrix of theta
+z=apply(thmat,1,lfun) # z holds the log lik values
+zmax=max(which(z==max(z)))  # finding the INDEX of the max lik
+plot(theta,exp(z),type="l") # plot of lik
+abline(v=theta[zmax],col="Blue")   #  verical line through max
+axis(3,theta[zmax],round(theta[zmax],4))  # one tick on the third axis 
+theta[zmax]   # theta corresponding to max lik
+}
+
+mymaxlikg(theta=seq(0,1,length=10000))
+
+```
+
+# Task 5, Joint Between Poisson and Binomial
+
+Suppose we have $p(y_1,y_2|\theta_1\theta_2) = bin(y_1|\theta_1)poiss(y_2|\theta_2)$, we can write the expression for the log likelihood as follows:
+
+$$ ln( p(y_1,y_2)) = ln(\binom{n}{y_1}p^{y_1}q^{n-y_1} \ \frac{\lambda^{y_2}e^{-\lambda}}{y_2!}) $$
+$$ ln( p(y_1,y_2)) = ln(\binom{n}{y_1}) + y_1ln(p) + (n-y_1)ln(q) + y_2ln(\lambda) -\lambda - ln(y_2!) $$
+
+We can approximate $\theta_1$ and $\theta_2$ through a function `mymaxlikg2()`!
+
+```{r}
+
+logbinpois=function(theta1,theta2) log(dbinom(4,size=20,prob=theta1)) +  log(dpois(4,lambda=theta2))
+
+maxlikg2=function(theta1,theta2,lfun="logbinpois",...){
+n1=length(theta1)
+n2=length(theta2)
+z=outer(theta1,theta2,lfun)
+contour(theta1,theta2,exp(z),...) # exp(z) gives the lik
+maxl=max(exp(z))    # max lik
+coord=which(exp(z)==maxl,arr.ind=TRUE)  # find the co-ords of the max
+th1est=theta1[coord[1]] # mxlik estimate of theta1
+th2est=theta2[coord[2]]
+abline(v=th1est,h=th2est)
+axis(3,th1est,round(th1est,2))
+axis(4,th2est,round(th2est,2),las=1)
+list(th1est=th1est,th2est=th2est)
+}
+maxlikg2(theta1=seq(0,1,length=1000),theta2=seq(0,10,length=1000),nlevels=20)
+
+```
+
+# Task 6, Normal
+
+In this section, we want to estimate $\mu$ and $\sigma$ from a normally distributed data. 
+
+```{r}
+
+y.list6 = c(10,12,13,15,12,11,10)
+
+mymlnorm=function(x,mu,sig,...){
+nmu=length(mu) 
+nsig=length(sig)
+n=length(x) 
+zz=c()
+
+lfun=function(x,m,p) log(dnorm(x,mean=m,sd=p))
+
+for(j in 1:nsig){
+  z=outer(x,mu,lfun,p=sig[j])
+  y=apply(z,2,sum)
+  zz=cbind(zz,y)
+}
+
+maxl=max(exp(zz))
+coord=which(exp(zz)==maxl,arr.ind=TRUE)
+maxlsig=apply(zz,1,max)
+
+contour(mu,sig,exp(zz),las=3,xlab=expression(mu),ylab=expression(sigma),axes=TRUE,
+main=expression(paste("L(",mu,",",sigma,")",sep="")),...)
+mlx=round(mean(x),2)  # theoretical
+mly=round(sqrt((n-1)/n)*sd(x),2)
+
+abline(v=mean(x),lwd=2,col="Green")
+muest=mu[coord[1]]
+sigest=sig[coord[2]]
+abline(v=muest, h=sigest)
+
+return(list(x=x,coord=coord,maxl=maxl))
+
+}
+
+mymlnorm(x=y.list6,mu=seq(10,15,length=1000),sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
+
+```
+
+# Task 7, Beta Distribution
+
+```{r}
+
+sam= rbeta(30,shape1=3,shape2=4)
+
+mymlbeta=function(x,alpha,beta,...){ 
+na=length(alpha)
+nb=length(beta)
+n=length(x) 
+zz=c()
+
+lfun=function(x,a,b) log(dbeta(x,shape1=a,shape2=b))   
+
+for(j in 1:nb){
+  z=outer(x,alpha,lfun,b=beta[j]) # z a matrix 
+  y=apply(z,2,sum)
+  zz=cbind(zz,y)
+}
+
+maxl=max(exp(zz)) 
+coord=which(exp(zz)==maxl,arr.ind=TRUE)
+aest=alpha[coord[1]] 
+best=beta[coord[2]]
+
+contour(alpha,beta,exp(zz),las=3,xlab=expression(alpha),ylab=expression(beta),axes=TRUE,
+main=expression(paste("L(",alpha,",",beta,")",sep="")),...)
+
+abline(v=aest, h=best)
+points(aest,best,pch=19)
+axis(4,best,round(best,2),col="Red")
+axis(3,aest,round(aest,2),col="Red")
+
+invisible(list(x=x,coord=coord,maxl=maxl,maxalpha=aest,maxbeta=best))
+
+}
+
+gri = matrix(1:12, nrow = 4, byrow =T)
+layout(gri)
+
+alphaq7 = c()
+betaq7 = c()
+
+for (res in 1:12){
+
+  samResample = sample(sam, 30, replace = T)
+  obj = mymlbeta(x=samResample,alpha=seq(1,6,length=100),beta=seq(1,6,length=100),lwd=2,labcex=1)
+  alphaq7 = append(obj$maxalpha, alphaq7)
+  betaq7 = append(obj$maxbeta, betaq7)
+
+}
+```
+
+```{r}
+
+index = 1:12
+
+meanBeta = function(a,b){
+  give = a/(a+b)
+  return(give)
+}
+
+varBeta = function(a,b){
+  give = (a*b)/((a+b)^2 * (a + b + 1))
+  return(give)
+}
+
+trueMean = meanBeta(3,4)
+trueVar = varBeta(3,4)
+
+testMean = meanBeta(alphaq7, betaq7)
+testVar = varBeta(alphaq7, betaq7)
+
+plot(index, testMean, main = 'Distances for Mean')
+lines(index, rep(trueMean, length(testMean)), col = '#2316B3', lw = 4)
+segments(index, testMean, index, rep(trueMean, length(testMean)))
+plot(index, testVar, main = 'Distances for Variance')
+lines(index, rep(trueVar, length(testVar)), col = '#2316B3', lw = 4)
+segments(index, testVar, index, rep(trueVar, length(testVar)))
+
+```
+
+# Task 8, Package 
+
+```{r}
+
+library(math4753)
+
+myNRML(x0=1,delta=0.000001,llik=function(x) log(dpois(12,x)*dpois(10,x)),xrange=c(0,20),parameter="lambda" )
+
+```
+

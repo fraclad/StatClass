@@ -1,0 +1,95 @@
+---
+title: "R squared"
+author: "Dr Wayne Stewart"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+There are a number of results associated with the pearson moment correlation coefficient and $R^2$ along with tests for $\rho$ the population correlation parameter.
+
+We know already that 
+
+$$\hat{\beta}_1=\frac{SS_{xy}}{SS_{xx}}$$
+
+$$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+
+# $r^2$ and $R^2$
+
+The defiition of $r$ is:
+
+$$r = \frac{SS_{xy}}{\sqrt{SS_{xx}SS_{yy}}}$$
+
+
+## $r$ and $\hat{\beta}_1$
+
+$$ r = \frac{SS_{xx}}{SS_{xx}}\frac{SS_{xy}}{\sqrt{SS_{xx}SS_{yy}}}=\hat{\beta}_1\frac{SS_{xx}}{\sqrt{SS_{xx}SS_{yy}}}=\hat{\beta}_1\sqrt{\frac{SS_{xx}}{SS_{yy}}}$$
+
+
+## $H_0:\rho = 0$
+
+So the hypothesis that $\rho = 0$ is equivalent to $\beta_1 =0$ 
+
+If you wish to test $H_0:\rho = 0$ then it is equivalent to testing $H_0:\beta_1=0$ within a SLR context. Which you should do and hence formal tests against $\rho = 0$ are redundant.
+
+
+## $r^2 = R^2$
+
+The total sum of squares identity can be expressed as
+
+$$TSS = MSS + RSS$$
+
+where $TSS=\sum_i(y_i-\bar{y})^2$,  $MSS=\sum_i(\hat{y}_i-\bar{y})^2$  and $RSS=\sum_i(y_i-\hat{y}_i)^2$
+
+We define multiple $R^2$ ( **or the coefficient of determination**  ) as 
+
+
+$$
+\begin{eqnarray}
+R^2 &=&\frac{MSS}{TSS}\\
+&=& \frac{TSS-RSS}{TSS}\\
+&=& \frac{SS_{yy}-\sum_i(y_i-\hat{y}_i)^2}{SS_{yy}}\\
+&=& \frac{SS_{yy}-\sum_i(y_i-(\bar{y}-\hat{\beta}_1\bar{x}+\hat{\beta}_1x_i))^2}{SS_{yy}}\\
+&=& \frac{SS_{yy}-\sum_i((y_i-\bar{y})-\hat{\beta}_1(x_i-\bar{x}))^2}{SS_{yy}}\\
+&=&\frac{SS_{yy}-SS_{yy}+2\hat{\beta}_1SS_{xy}-\hat{\beta}_1^2SS_{xx}}{SS_{yy}}\\
+&=&\frac{2\hat{\beta}_1SS_{xy}-\hat{\beta}_1^2SS_{xx}}{SS_{yy}}\; , SS_{xy}=\hat{\beta}_1 SS_{xx}\\
+&=&\frac{2\hat{\beta}_1^2SS_{xx}-\hat{\beta}_1^2SS_{xx}}{SS_{yy}}\\
+&=& \frac{\hat{\beta}_1^2SS_{xx}}{SS_{yy}}\\
+&=& r^2
+\end{eqnarray}
+$$
+
+
+
+# Size of $R^2$ and $r$
+
+Since $R^2=\frac{MSS}{TSS}$ 
+
+where 
+
+$$TSS=MSS+RSS$$
+
+All terms are positive since they are sums of squares.
+
+Therefore 
+
+
+$$0\le R^2 \le 1$$
+
+This means that 
+
+$$0\le r^2 \le 1$$
+
+Hence 
+
+$$ -1\le r \le 1 $$.

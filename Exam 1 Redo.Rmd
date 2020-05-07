@@ -1,0 +1,179 @@
+---
+title: "Exam 1 Redo"
+author: "Rahmat Ashari"
+date: " `r format(Sys.time(), format = '%b %d, %Y')` "
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Original score = 52/60**
+
+**Questions with more than 1 point lost = Q2, Q5, Q6**
+
+# Question 2
+
+<center>
+![Question 2](C:\Users\ra\Documents\StatClass\ex1q2.png)
+</center>
+
+### a) 
+
+Exam is a quantitative variable! T/F?
+
+Answer **T**
+
+### b) 
+
+Gender is a qualitative variable! T/F?
+
+Answer **T**
+
+### c)
+
+What Degree shows the smallest median Exam grade? see fig 1 on the preceding page
+
+Degree with the smallest Exam median: **BSc**
+
+### d)
+
+What Degree has the smallest Exam IQR? see figure 1 on the precedng page
+
+Degree with smallest Exam IQR: **BSc**
+
+### e)
+
+What function should be where the elipsis is placed in Line A? (Hint: geom_)?
+
+Answer: **geom_point()**
+
+# Question 5
+
+<center>
+![Question 5](C:\Users\ra\Documents\StatClass\ex1q5.png)
+</center>
+
+### a)
+
+Find the mean and the std dev of Y, the number of cracks per specimen
+
+$$\mu_y = \lambda = 2.5$$
+
+
+$$ \sigma_y = \sqrt{\lambda} = \sqrt{2.5} = 1.5811 $$
+
+
+### b)
+
+Find the probability that a randomly selected concrete speciment has exactly 5 cracks.
+
+```{r}
+
+round(dpois(5,2.5),4)
+
+```
+
+
+### c) 
+
+Find the probability that a randomly selected conrete specimen has two or more cracks.
+
+$$ P(Y \geq 2) = 1 - P(Y \leq 1)  $$
+
+```{r}
+
+round(1 - ppois(1, 2.5), 4)
+
+```
+
+### d) 
+
+Find the probability of $P(\mu - 2\sigma < Y < \mu + 2\sigma)$. Does the result agree with the Empirical Rule?
+
+$$ P(\mu - 2\sigma < Y < \mu + 2\sigma) $$
+$$ P(2.5 - 2(1.5811) < Y < 2.5 + 2(1.5811)) $$
+$$ P(-0.6622 < Y < 5.6622) $$
+
+For Poisson distribution, such probability can be computed as:
+
+$$ P( Y \leq 5)$$
+
+```{r}
+
+round(ppois(5,2.5),4)
+
+```
+
+Empirical rule states that 95% of data lies within two standard deviation of the mean. 
+
+**Hence, result agrees with the Empirical Rule is True.** 
+
+### e) 
+
+Find $P(2 \leq Y < 6)$ using the R output provided
+
+The question can be computed as:
+
+$$ P(2 \leq Y < 6) = P(Y \leq 5) - P(Y \leq 1)  $$
+
+```{r}
+
+answer5 = ppois(5, 2.5) - ppois(1, 2.5)
+round(answer5,4)
+
+```
+
+# Question 6
+
+<center>
+![Question 6](C:\Users\ra\Documents\StatClass\ex1q6.png)
+</center>
+
+### a) 
+
+Write down Bayes' rule needed to answer the above question in terms of $+, U, \overline{U}$
+
+$$ P(U|+) = \frac{P(U)P(+|U)}{P(U)P(+|U)+P(\overline{U}P(+|\overline{U})}$$
+
+### b)
+
+In the case of the above tetsing problem, write down the expression for $P(+)$ in terms of a summation 
+
+$$ p(+) = P(+|U)P(U) + P(+|\overline{U})P(U) $$
+
+### c)
+
+Identify the prior in the tetsing problem
+
+**The prior is $P(U)$**
+
+### d)
+
+If a randomly selected individual tests positive (+), what is the probability he or she is a User (U)?
+
+$P(U) = 0.002$
+
+$P(\overline{U}) = 1 - 0.002 = 0.998$
+
+$P(-|\overline{U}) = 0.97$
+
+$P(+|\overline{U}) = 1 - P(-|\overline{U}) = 1 - 0.97 = 0.03$
+
+
+$$ P(U|+) = \frac{P(U)P(+|U)}{P(U)P(+|U)+P(\overline{U}P(+|\overline{U})}$$
+
+$$ P(U|+) = \frac{0.002*0.99}{0.02*0.99 + 0.998*0.03}$$
+
+$$ P(U|+) = 0.062030$$
+
+### e) 
+
+If a randomly selected individual tests positive (+), what is the probability he or she is *not* a User ($\overline{U}$)?
+
+$$ P(\overline{U}|+) = 1 - P(U|+)$$
+$$ P(\overline{U}|+) = 1 - 0.062030 = 0.937970$$
